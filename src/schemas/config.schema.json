@@ -1,14 +1,50 @@
 {
-  "$id":  "https://felix.kopf-inet.de/coursedemoapp/config.schema.json",
-  "$schema":  "http://json-schema.org/2019-09/schema#",
-  "description":  "Configuration file for the lecture demo app",
-  "type":  "object",
-  "properties":  {
-    "port":  {
-      "type": "number"
-    }
-  },
-  "required":  [
-    "port"
-  ]
+    "$id": "https://felix.kopf-inet.de/coursedemoapp/config.schema.json",
+    "$schema": "http://json-schema.org/2019-09/schema#",
+    "description": "Configuration file for the lecture demo app",
+    "type": "object",
+    "properties": {
+        "port": {
+            "type": "number"
+        },
+        "mongodb": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "number"
+                },
+                "auth": {
+                    "type": "object",
+                    "properties": {
+                        "username": {
+                            "type": "string"
+                        },
+                        "password": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "username",
+                        "password"
+                    ]
+                }
+            },
+            "required": [
+                "auth",
+                "host",
+                "port"
+            ]
+        },
+        "jwt": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "port",
+        "mongodb",
+        "jwt"
+    ]
 }

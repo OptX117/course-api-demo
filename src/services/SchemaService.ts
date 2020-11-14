@@ -2,6 +2,8 @@ import { SchemaService, SchemaStore } from '../types';
 import path from 'path';
 import { promises as fs } from 'fs';
 import jsonschema, { ValidatorResult } from 'jsonschema';
+import { NextFunction, Request, Response } from 'express';
+import { add } from 'winston';
 
 export default class SchemaServiceImpl implements SchemaService {
     private readonly schemaDir: string;
@@ -56,6 +58,21 @@ export default class SchemaServiceImpl implements SchemaService {
                 }
                 return v.validate(obj, mainSchema);
             });
+    }
+
+    async validateRequest(schemaName: string, additionalSchemas: string[], req: Request, res: Response,
+                    next: NextFunction): Promise<void> {
+        try {
+            const validationResult = await this.validateSchema(req.body, schemaName, additionalSchemas);
+
+            if (validationResult.valid) {
+                next();
+            } else {
+                next(new Error('Validation errors'));
+            }
+        } catch (err) {
+            next(err);
+        }
     }
 
     /**

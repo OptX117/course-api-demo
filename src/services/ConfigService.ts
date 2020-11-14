@@ -6,15 +6,18 @@ import logger from '../winston';
 
 export default class ConfigurationServiceImpl implements ConfigurationService {
     private config?: Configuration;
+    private openApiDefinition?: Record<string, unknown>;
 
     private readonly configPath: string;
+    private readonly openApiDefinitionPath: string;
     private readonly schemaService: SchemaService;
 
     /**
      * @param {string} configPath The path to load as configuration.<br>Should be <code>path.join(process.cwd(), 'config', 'config.json')</code>, except for testing.
      */
-    constructor(configPath: string, schemaService: SchemaService) {
+    constructor(configPath: string, openApiDefinitionPath: string, schemaService: SchemaService) {
         this.configPath = configPath;
+        this.openApiDefinitionPath = openApiDefinitionPath;
         this.schemaService = schemaService;
     }
 
@@ -38,12 +41,37 @@ export default class ConfigurationServiceImpl implements ConfigurationService {
 
             if (!this.config) {
                 this.config = {
-                    port: 3000
+                    port: 3000,
+                    mongodb: {
+                        host: 'localhost',
+                        port: 27017,
+                        auth: {
+                            username: '',
+                            password: ''
+                        }
+                    },
+                    jwt: ''
                 };
             }
 
             return Object.freeze(this.config as Configuration);
         }
+    }
+
+    public async getOpenAPIDefinition(): Promise<Readonly<Record<string, unknown>>> {
+        if (this.openApiDefinition != null) {
+            return Object.freeze(this.openApiDefinition);
+        } else {
+            logger.info('Loading OpenAPI definition!');
+            try {
+                return await fs.readFile(this.openApiDefinitionPath).then(res => JSON.parse(res.toString()));
+            } catch (err) {
+                logger.error('Could not load OpenAPI definition! Returning empty file.', {err});
+                return {};
+            }
+
+        }
+
     }
 
 }
