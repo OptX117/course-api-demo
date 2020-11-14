@@ -79,7 +79,8 @@ export default function (app: Express): Router {
      *    requestBody:
      *     $ref: "#/components/requestBodies/Login"
      */
-    router.post('/login', schemaService.validateRequest.bind(schemaService, 'login.requestbody.schema.json', []),
+    router.post('/login',
+        schemaService.validateRequest('login.requestbody.schema.json', []),
         authService.checkUsername(),
         async (req, res) => {
             if (req.params.username != null) {

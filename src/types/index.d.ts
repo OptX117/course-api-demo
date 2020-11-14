@@ -45,7 +45,7 @@ export interface SchemaStore {
 export interface SchemaService {
     /**
      * Validate a given object against one or more schemas
-     * @param {Record<string, unknown>} obj The object to validate
+     * @param {Record<string, ?>} obj The object to validate
      * @param {string} schemaName The main schema to validate against
      * @param {string[]} additionalSchemas Additional schemas to load
      * @returns {Promise<ValidatorResult>} Resolves with any validator errors or success
@@ -53,8 +53,8 @@ export interface SchemaService {
     validateSchema(obj: Record<string, unknown>, schemaName: string,
                    additionalSchemas?: string[]): Promise<ValidatorResult>;
 
-    validateRequest(schemaName: string, additionalSchemas: string[], req: Request, res: Response,
-                    next: NextFunction): void;
+    validateRequest(schemaName: string, additionalSchemas: string[]): (req: Request, res: Response,
+                                                                        next: NextFunction) => void;
 }
 
 /**
