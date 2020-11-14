@@ -1,10 +1,10 @@
 import { Express, Router } from 'express';
 
-import registerLecturesRoutes from './lectures';
+import registerCoursesRoutes from './courses';
 
 export default function registerRoutes(app: Express): Router {
     const router = Router();
-    router.use('/lectures', registerLecturesRoutes(app));
+    router.use('/courses', registerCoursesRoutes(app));
 
     return router;
 }

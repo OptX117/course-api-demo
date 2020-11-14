@@ -32,3 +32,31 @@ export interface SchemaService {
     validateSchema(obj: Record<string, unknown>, schemaName: string,
                    additionalSchemas?: string[]): Promise<ValidatorResult>;
 }
+
+export interface CourseService {
+    getAllCourses(): Readonly<Course[]>;
+    addCourse(course: Omit<Course, 'id'>): Course;
+}
+
+export interface Course {
+    id: number;
+    title: string;
+    description?: string;
+    lecturer: User;
+    price: number;
+    dates: any[];
+    category: CourseCategory,
+    organiser?: string;
+}
+
+export interface User {
+    id: number;
+    name: string;
+    isLecturer: boolean;
+}
+
+export type CourseCategory =
+    'Konferenz' |
+    'Sprachkurs' |
+    'Meeting' |
+    'Weiterbildung';

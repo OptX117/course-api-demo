@@ -1,5 +1,5 @@
 {
-  "$id":  "https://felix.kopf-inet.com/lecturedemoapp/config.schema.json",
+  "$id":  "https://felix.kopf-inet.de/coursedemoapp/config.schema.json",
   "$schema":  "http://json-schema.org/2019-09/schema#",
   "description":  "Configuration file for the lecture demo app",
   "type":  "object",

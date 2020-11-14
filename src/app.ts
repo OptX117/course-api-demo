@@ -10,10 +10,13 @@ import ConfigurationServiceImpl from './services/ConfigService';
 import SchemaServiceImpl from './services/SchemaService';
 
 import registerRoutes from './routes';
+import CourseServiceImpl from './services/CourseService';
 
 
 async function main() {
     try {
+        logger.info('Starting')
+
         const app = express();
         app.use(express.json());
 
@@ -28,9 +31,11 @@ async function main() {
         const configService = new ConfigurationServiceImpl(path.join(process.cwd(), 'config', 'config.json'),
             validationService);
         const config = await configService.getConfiguration();
+        const courseService = new CourseServiceImpl();
 
         app.set(Constants.ConfigurationService, configService);
         app.set(Constants.SchemaValidationService, validationService);
+        app.set(Constants.CourseService, courseService);
 
         const server = http.createServer({}, app);
 
