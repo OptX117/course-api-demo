@@ -9,7 +9,7 @@ chai.use(sinonChai);
 let service: UserServiceImpl;
 let proxyStubs: Record<string, SinonStub>;
 
-describe('UserServiceImpl', () => {
+describe('UserService', () => {
     beforeEach(() => {
         proxyStubs = {
             findOne: sinon.stub(),

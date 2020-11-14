@@ -31,6 +31,7 @@ describe('ConfigService', () => {
             valid: true
         });
         const service = new ConfigurationServiceImpl(path.join(__dirname, 'ConfigServiceFiles', 'config.json'),
+            path.join(__dirname, 'ConfigServiceFiles', 'openapi.json'),
             schemaServiceMock.service);
         const config: Configuration = await service.getConfiguration();
 
@@ -42,6 +43,7 @@ describe('ConfigService', () => {
             valid: true
         });
         const service = new ConfigurationServiceImpl(path.join(__dirname, 'ConfigServiceFiles'),
+            path.join(__dirname, 'ConfigServiceFiles', 'openapi.json'),
             schemaServiceMock.service);
         const config: Configuration = await service.getConfiguration();
 
@@ -56,6 +58,7 @@ describe('ConfigService', () => {
         });
 
         const service = new ConfigurationServiceImpl(path.join(__dirname, 'ConfigServiceFiles', 'wrongConfig.json'),
+            path.join(__dirname, 'ConfigServiceFiles', 'openapi.json'),
             schemaServiceMock.service);
         const config: Configuration = await service.getConfiguration();
 

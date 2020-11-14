@@ -8,7 +8,6 @@ const path = require('path');
 const webpack = require('webpack');
 const gulpWebpack = require('webpack-stream');
 const swaggerJSDoc = require('swagger-jsdoc');
-const promisify = require('util').promisify;
 
 const spawn = require('child_process').spawn;
 
@@ -102,6 +101,15 @@ gulp.task('start', async () => {
         if (code === 8) {
             log.error('Error detected, waiting for changes...');
         }
+    });
+});
+
+gulp.task('test', (cb) => {
+    const test = spawn('mocha', ['test/**/*.spec.ts'], {
+        stdio: 'inherit'
+    });
+    test.on('close', function () {
+        cb();
     });
 });
 

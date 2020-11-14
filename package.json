@@ -68,7 +68,7 @@
         "start": "gulp start",
         "watch": "gulp watch",
         "lint": "eslint . --ext .ts",
-        "unit": "mocha test/**/*.spec.ts"
+        "unit": "gulp test"
     },
     "api": {
         "title": "Course API",
