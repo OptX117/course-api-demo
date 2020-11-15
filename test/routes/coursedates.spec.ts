@@ -1,5 +1,5 @@
 import common from './common';
-import { Course, CourseCategory, User } from '../../src/types';
+import { Course, CourseCategory, UpdateCourseDate, User } from '../../src/types';
 import { Express } from 'express';
 
 const {chai, getApp, disconnectDB, getDBEntries, setupDB, doLogin} = common;
@@ -10,7 +10,7 @@ let users: Record<string, User>;
 let courses: Record<string, Course>;
 let courseCategories: CourseCategory[];
 
-describe('/courses', () => {
+describe('/courses/:id/dates', () => {
     before(async () => {
         app = await getApp();
     });
@@ -26,45 +26,31 @@ describe('/courses', () => {
     });
 
     describe('GET', () => {
-        it('should return all courses', () => {
+        it('should return all course dates for the specific course', () => {
             return chai.request(app)
-                .get('/courses')
+                .get('/courses/' + courses['TEST'].id + '/dates')
                 .send()
                 .then(res => {
                     expect(res).to.have.status(200);
                     expect(res).to.be.json;
 
                     const body = res.body;
-                    expect(body).to.eql(Object.values(courses));
+                    expect(body).to.eql(courses['TEST'].dates);
                 });
         });
     });
 
     describe('POST', () => {
-        it('should return status 200 and the new course if login cookie is set', () => {
-            const courseInput = {
-                'title': '2. Test',
-                'description': 'Woooo',
-                'lecturer': '002',
-                'price': 1887,
-                'dates': [],
-                'category': 'Sprachkurs',
-                'organiser': 'ICH'
-            };
-
-            const courseInputReturn = {
-                'title': '2. Test',
-                'description': 'Woooo',
-                'lecturer': users['002'],
-                'price': 1887,
-                'dates': [],
-                'category': 'Sprachkurs',
-                'organiser': 'ICH'
+        it('should return status 200 and the new course date if login cookie is set', () => {
+            const courseDateInput: UpdateCourseDate = {
+                startDate: '2020-11-28T18:00:00+01:00',
+                endDate: '2020-11-28T20:00:00+01:00',
+                totalSpots: 7
             };
 
             return chai.request(app)
-                .post('/courses')
-                .send(courseInput)
+                .post('/courses/' + courses['TEST'].id + '/dates')
+                .send(courseDateInput)
                 .set('Cookie',
                     'jsession=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMDAyIiwibGVjdHVyZXIiOnRydWUsImlhdCI6MTYwNTQ0MzM0NSwiaXNzIjoiQ291cnNlRGVtb0FwcCIsInN1YiI6IjVmYjExZjA3ZmYxNGFmMjg5MjZiMjA1NiJ9.oVYK8VapcACn7i8AfvP5zdheXEcrSM2BFEIOT902JiM')
                 .then(res => {
@@ -73,35 +59,21 @@ describe('/courses', () => {
                     const body = res.body;
                     const {id} = body;
                     delete body.id;
-                    expect(body).to.eql(courseInputReturn);
+                    expect(body).to.eql(courseDateInput);
                     expect(id).to.not.be.undefined;
                 });
         });
 
-        it('should return status 200 and the new course if login header is set', () => {
-            const courseInput = {
-                'title': '2. Test',
-                'description': 'Woooo',
-                'lecturer': '002',
-                'price': 1887,
-                'dates': [],
-                'category': 'Sprachkurs',
-                'organiser': 'ICH'
-            };
-
-            const courseInputReturn = {
-                'title': '2. Test',
-                'description': 'Woooo',
-                'lecturer': users['002'],
-                'price': 1887,
-                'dates': [],
-                'category': 'Sprachkurs',
-                'organiser': 'ICH'
+        it('should return status 200 and the new course date if login header is set', () => {
+            const courseDateInput: UpdateCourseDate = {
+                startDate: '2020-11-28T18:00:00+01:00',
+                endDate: '2020-11-28T20:00:00+01:00',
+                totalSpots: 7
             };
 
             return chai.request(app)
-                .post('/courses')
-                .send(courseInput)
+                .post('/courses/' + courses['TEST'].id + '/dates')
+                .send(courseDateInput)
                 .set('Authorization',
                     'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMDAyIiwibGVjdHVyZXIiOnRydWUsImlhdCI6MTYwNTQ0MzM0NSwiaXNzIjoiQ291cnNlRGVtb0FwcCIsInN1YiI6IjVmYjExZjA3ZmYxNGFmMjg5MjZiMjA1NiJ9.oVYK8VapcACn7i8AfvP5zdheXEcrSM2BFEIOT902JiM')
                 .then(res => {
@@ -110,36 +82,23 @@ describe('/courses', () => {
                     const body = res.body;
                     const {id} = body;
                     delete body.id;
-                    expect(body).to.eql(courseInputReturn);
+                    expect(body).to.eql(courseDateInput);
                     expect(id).to.not.be.undefined;
+
                 });
         });
 
-        it('should return status 200 and the new course should be found in GET request', () => {
-            const courseInput = {
-                'title': '2. Test',
-                'description': 'Woooo',
-                'lecturer': '002',
-                'price': 1887,
-                'dates': [],
-                'category': 'Sprachkurs',
-                'organiser': 'ICH'
-            };
-
-            const courseInputReturn = {
-                'title': '2. Test',
-                'description': 'Woooo',
-                'lecturer': users['002'],
-                'price': 1887,
-                'dates': [],
-                'category': 'Sprachkurs',
-                'organiser': 'ICH'
+        it('should return status 200 and the new course date should be found in GET request', () => {
+            const courseDateInput: UpdateCourseDate = {
+                startDate: '2020-11-28T18:00:00+01:00',
+                endDate: '2020-11-28T20:00:00+01:00',
+                totalSpots: 7
             };
 
             const agent = chai.request.agent(app);
             return agent
-                .post('/courses')
-                .send(courseInput)
+                .post('/courses/' + courses['TEST'].id + '/dates')
+                .send(courseDateInput)
                 .set('Cookie',
                     'jsession=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiMDAyIiwibGVjdHVyZXIiOnRydWUsImlhdCI6MTYwNTQ0MzM0NSwiaXNzIjoiQ291cnNlRGVtb0FwcCIsInN1YiI6IjVmYjExZjA3ZmYxNGFmMjg5MjZiMjA1NiJ9.oVYK8VapcACn7i8AfvP5zdheXEcrSM2BFEIOT902JiM')
                 .then(res => {
@@ -148,10 +107,10 @@ describe('/courses', () => {
                     const body = res.body;
                     const {id} = body;
                     delete body.id;
-                    expect(body).to.eql(courseInputReturn);
+                    expect(body).to.eql(courseDateInput);
                     expect(id).to.not.be.undefined;
 
-                    return agent.get('/courses')
+                    return agent.get('/courses/' + courses['TEST'].id + '/dates')
                         .send()
                         .then(res => {
                             expect(res).to.have.status(200);
@@ -160,7 +119,7 @@ describe('/courses', () => {
                                 delete (v as any).id;
                                 return v;
                             });
-                            expect(body).to.eql([...Object.values(courses), courseInputReturn].map(v => {
+                            expect(body).to.eql([...courses['TEST'].dates, courseDateInput].map(v => {
                                 delete (v as any).id;
                                 return v;
                             }));
@@ -173,14 +132,13 @@ describe('/courses', () => {
         describe('GET', () => {
             it('should return status 200 and a course if found', () => {
                 return chai.request(app)
-                    .get(`/courses/${courses['TEST'].id}`)
+                    .get(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                     .send()
                     .then(res => {
                         expect(res).to.have.status(200);
                         expect(res).to.be.json;
-
                         const body = res.body;
-                        expect(body).to.eql(courses['TEST']);
+                        expect(body).to.eql(courses['TEST'].dates[0]);
                     });
             });
 
@@ -200,12 +158,12 @@ describe('/courses', () => {
 
         describe('PUT', () => {
             it('should return status 200 and change the information if user is authorized', () => {
-                const courseInput = {
-                    'title': '2. Test'
+                const courseDateInput = {
+                    totalSpots: 8
                 };
 
-                const courseInputReturn = Object.assign(courses['TEST'], {
-                    title: '2. Test'
+                const courseDateInputReturn = Object.assign(courses['TEST'].dates[0], {
+                    totalSpots: 8
                 });
 
                 const agent = chai.request.agent(app);
@@ -213,24 +171,24 @@ describe('/courses', () => {
                 return doLogin(agent, true)
                     .then(user => {
                         return agent
-                            .put('/courses/' + courses['TEST'].id)
-                            .send(courseInput)
+                            .put(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
+                            .send(courseDateInput)
                             .set('Authorization',
                                 'Bearer ' + user.token)
                             .then(res => {
                                 expect(res).to.have.status(200);
                                 expect(res).to.be.json;
                                 const body = res.body;
-                                expect(body).to.eql(courseInputReturn);
+                                expect(body).to.eql(courseDateInputReturn);
 
-                                return agent.get('/courses/' + courses['TEST'].id)
+                                return agent.get(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                                     .send()
                                     .then(res => {
                                         expect(res).to.have.status(200);
                                         expect(res).to.be.json;
 
                                         const body = res.body;
-                                        expect(body).to.eql(courseInputReturn);
+                                        expect(body).to.eql(courseDateInputReturn);
                                     });
                             });
                     }).finally(() => agent.close());
@@ -247,7 +205,7 @@ describe('/courses', () => {
                     return doLogin(agent, true)
                         .then(user => {
                             return agent
-                                .put('/courses/' + courses['TEST'].id)
+                                .put(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                                 .send(courseInput)
                                 .set('Authorization',
                                     'Bearer ' + user.token)
@@ -257,14 +215,14 @@ describe('/courses', () => {
                                     const body = res.body;
                                     expect(body).to.eql({});
 
-                                    return agent.get('/courses/' + courses['TEST'].id)
+                                    return agent.get(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                                         .send()
                                         .then(res => {
                                             expect(res).to.have.status(200);
                                             expect(res).to.be.json;
 
                                             const body = res.body;
-                                            expect(body).to.eql(courses['TEST']);
+                                            expect(body).to.eql(courses['TEST'].dates[0]);
                                         });
 
                                 });
@@ -272,37 +230,37 @@ describe('/courses', () => {
                 });
 
             it('should return status 403 and not change the information if user is not authorized', () => {
-                const courseInput = {
-                    'title': '2. Test'
+                const courseDateInput = {
+                    totalSpots: 8
                 };
 
                 const agent = chai.request.agent(app);
 
                 return agent
-                    .put('/courses/' + courses['TEST'].id)
-                    .send(courseInput)
+                    .put(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
+                    .send(courseDateInput)
                     .then(res => {
                         expect(res).to.have.status(403);
                         expect(res).to.not.be.json;
                         const body = res.body;
                         expect(body).to.eql({});
 
-                        return agent.get('/courses/' + courses['TEST'].id)
+                        return agent.get(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                             .send()
                             .then(res => {
                                 expect(res).to.have.status(200);
                                 expect(res).to.be.json;
 
                                 const body = res.body;
-                                expect(body).to.eql(courses['TEST']);
+                                expect(body).to.eql(courses['TEST'].dates[0]);
                             });
                     }).finally(() => agent.close());
             });
 
             it('should return status 403 and not change the information if user is not the lecturer of a course',
                 () => {
-                    const courseInput = {
-                        'title': '2. Test'
+                    const courseDateInput = {
+                        totalSpots: 8
                     };
 
                     const agent = chai.request.agent(app);
@@ -314,8 +272,8 @@ describe('/courses', () => {
                         }).then(res => res.body.token)
                         .then(token => {
                             return agent
-                                .put('/courses/' + courses['TEST'].id)
-                                .send(courseInput)
+                                .put(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
+                                .send(courseDateInput)
                                 .set('Authorization',
                                     'Bearer ' + token)
                                 .then(res => {
@@ -324,14 +282,14 @@ describe('/courses', () => {
                                     const body = res.body;
                                     expect(body).to.eql({});
 
-                                    return agent.get('/courses/' + courses['TEST'].id)
+                                    return agent.get(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                                         .send()
                                         .then(res => {
                                             expect(res).to.have.status(200);
                                             expect(res).to.be.json;
 
                                             const body = res.body;
-                                            expect(body).to.eql(courses['TEST']);
+                                            expect(body).to.eql(courses['TEST'].dates[0]);
                                         });
                                 });
                         }).finally(() => agent.close());
@@ -339,22 +297,22 @@ describe('/courses', () => {
         });
 
         describe('DELETE', () => {
-            it('should return status 200 and delete the course if user is authorized', () => {
+            it('should return status 200 and delete the course date if user is authorized', () => {
                 const agent = chai.request.agent(app);
 
                 return doLogin(agent, true)
                     .then(user => {
                         return agent
-                            .delete('/courses/' + courses['TEST'].id)
+                            .delete(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                             .set('Authorization',
                                 'Bearer ' + user.token)
                             .then(res => {
                                 expect(res).to.have.status(200);
                                 expect(res).to.be.json;
                                 const body = res.body;
-                                expect(body).to.eql(courses['TEST']);
+                                expect(body).to.eql(courses['TEST'].dates[0]);
 
-                                return agent.get('/courses/' + courses['TEST'].id)
+                                return agent.get(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                                     .send()
                                     .then(res => {
                                         expect(res).to.have.status(404);
@@ -367,30 +325,30 @@ describe('/courses', () => {
                     }).finally(() => agent.close());
             });
 
-            it('should return status 403 and not delete the course if user is not authorized', () => {
+            it('should return status 403 and not delete the course date if user is not authorized', () => {
                 const agent = chai.request.agent(app);
 
                 return agent
-                    .delete('/courses/' + courses['TEST'].id)
+                    .delete(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                     .then(res => {
                         expect(res).to.have.status(403);
                         expect(res).to.not.be.json;
                         const body = res.body;
                         expect(body).to.eql({});
 
-                        return agent.get('/courses/' + courses['TEST'].id)
+                        return agent.get(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                             .send()
                             .then(res => {
                                 expect(res).to.have.status(200);
                                 expect(res).to.be.json;
 
                                 const body = res.body;
-                                expect(body).to.eql(courses['TEST']);
+                                expect(body).to.eql(courses['TEST'].dates[0]);
                             });
                     }).finally(() => agent.close());
             });
 
-            it('should return status 403 and not delete the course if user is not the lecturer of a course',
+            it('should return status 403 and not delete the course date if user is not the lecturer of a course',
                 () => {
                     const agent = chai.request.agent(app);
 
@@ -401,7 +359,7 @@ describe('/courses', () => {
                         }).then(res => res.body.token)
                         .then(token => {
                             return agent
-                                .delete('/courses/' + courses['TEST'].id)
+                                .delete(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                                 .set('Authorization',
                                     'Bearer ' + token)
                                 .then(res => {
@@ -410,19 +368,18 @@ describe('/courses', () => {
                                     const body = res.body;
                                     expect(body).to.eql({});
 
-                                    return agent.get('/courses/' + courses['TEST'].id)
+                                    return agent.get(`/courses/${courses['TEST'].id}/dates/${courses['TEST'].dates[0].id}`)
                                         .send()
                                         .then(res => {
                                             expect(res).to.have.status(200);
                                             expect(res).to.be.json;
 
                                             const body = res.body;
-                                            expect(body).to.eql(courses['TEST']);
+                                            expect(body).to.eql(courses['TEST'].dates[0]);
                                         });
                                 });
                         }).finally(() => agent.close());
                 });
-
         });
     });
 });

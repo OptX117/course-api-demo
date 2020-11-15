@@ -77,7 +77,7 @@ const logger = process.env.NODE_ENV !== 'test' ? winston.createLogger({
 }) : winston.createLogger({
     transports: [
         new winston.transports.Console({
-            level: 'debug',
+            level: 'error',
             format: winston.format.combine(
                 winston.format.timestamp({
                     format: 'YYYY-MM-DD HH:mm:ss'

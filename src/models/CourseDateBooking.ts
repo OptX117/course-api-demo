@@ -16,11 +16,15 @@ import * as mongoose from 'mongoose';
  *     spots:
  *      type: number
  *      minimum: 1
+ *     course:
+ *      type: string
+ *     date:
+ *      type: string
  *    required:
  *     - id
  *     - user
  *     - spots
- *
+ *     - course
  * @type {module:mongoose.Schema<any>}
  */
 export const CourseDateBookingSchema = new mongoose.Schema({
@@ -31,6 +35,14 @@ export const CourseDateBookingSchema = new mongoose.Schema({
     spots: {
         type: 'number',
         min: 1,
+        required: true
+    },
+    course: {
+        type: 'string',
+        required: true
+    },
+    date: {
+        type: 'string',
         required: true
     }
 });

@@ -9,12 +9,11 @@ const gulpWebpack = require('webpack-stream');
 const swaggerJSDoc = require('swagger-jsdoc');
 const mongoose = require('mongoose');
 const mongodb = require('mongodb');
-
+const nanoid = require('nanoid').nanoid;
 const spawn = require('child_process').spawn;
 
 const packageJson = require('./package.json');
 const srcConfig = require('./src/config/config.json');
-
 const targetPath = path.join(__dirname, 'bin');
 const srcPath = path.join(__dirname, 'src');
 
@@ -192,7 +191,17 @@ gulp.task('fill-db', gulp.series('start-db', 'clear-db', async () => {
     const insertedCourses = await connected.connection.collection('courses').insertMany([
         {
             title: 'TEST',
-            dates: [],
+            dates: [{
+                id: nanoid(4),
+                startDate: '2020-11-13T18:00:00+01:00',
+                endDate: '2020-11-13T20:00:00+01:00',
+                totalSpots: 10
+            },{
+                id: nanoid(4),
+                startDate: '2020-11-20T18:00:00+01:00',
+                endDate: '2020-11-20T20:00:00+01:00',
+                totalSpots: 5
+            }],
             price: 1887,
             description: 'TEST',
             category: new mongodb.ObjectID(insertedCategories.Konferenz),
@@ -201,6 +210,7 @@ gulp.task('fill-db', gulp.series('start-db', 'clear-db', async () => {
         previousValue[currentValue.name] = currentValue._id;
         return previousValue;
     }, {}));
+
 
     log.info(`Inserted ${Object.keys(insertedCategories).length} categories, ${Object.keys(insertedUsers).length} users, ${Object.keys(insertedCourses).length} courses.`);
     connected.disconnect();

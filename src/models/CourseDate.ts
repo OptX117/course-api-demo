@@ -10,8 +10,7 @@ import * as mongoose from 'mongoose';
  *    type: object
  *    properties:
  *     id:
- *      type: number
- *      minimum: 0
+ *      type: string
  *     startdate:
  *      type: string
  *      format: date-time
@@ -21,25 +20,25 @@ import * as mongoose from 'mongoose';
  *     totalSpots:
  *      type: number
  *      minimum: 1
- *     availableSpots:
- *         type: number
- *         minimum: 0
  *    required:
  *     - id
- *     - startdate
- *     - enddate
+ *     - startDate
+ *     - endDate
  *     - totalSpots
-
  *
  * @type {module:mongoose.Schema<any>}
  */
 export const CourseDateSchema = new mongoose.Schema({
-    startdate: {
+    id: {
+        type: 'string',
+        required: true
+    },
+    startDate: {
         type: 'string',
         format: 'date-time',
         required: true
     },
-    enddate: {
+    endDate: {
         type: 'string',
         format: 'date-time',
         required: true

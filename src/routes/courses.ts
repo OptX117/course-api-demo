@@ -1,6 +1,7 @@
 import { Express, Router } from 'express';
 import Constants from '../constants';
 import { AuthService, Course, CourseService, SchemaService } from '../types';
+import registerCourseDatesRoutes from './coursedates';
 
 /**
  * Registers all routes under /courses
@@ -94,6 +95,14 @@ import { AuthService, Course, CourseService, SchemaService } from '../types';
  *        organiser:
  *         type: string
  *       additionalProperties: false
+ *  parameters:
+ *   CourseId:
+ *    name: courseid
+ *    in: path
+ *    required: true
+ *    description: "the Id of the course"
+ *    schema:
+ *     type: number
  */
 export default function (app: Express): Router {
     const router = Router();
@@ -217,8 +226,8 @@ export default function (app: Express): Router {
      *     404:
      *      description: "Not Found - Course does not exist"
      */
-    router.get('/:id', async (req, res) => {
-        const course = await courseService.getCourse(req.params.id);
+    router.get('/:courseid', async (req, res) => {
+        const course = await courseService.getCourse(req.params.courseid);
         if (course != null) {
             res.json(course);
         } else {
@@ -253,85 +262,48 @@ export default function (app: Express): Router {
      *     - cookieAuth: []
      *     - bearerAuth: []
      */
-    router.put('/:id',
+    router.put('/:courseid',
         authService.authorize(true),
         schemaService.validateRequest('coursechange.requestbody.schema.json', ['./']),
         async (req, res) => {
-            const course = await courseService.getCourse(req.params.id);
-            if (course != null && course.lecturer.id === req.params.userid) {
-                const updatedCourse = await courseService.updateCourse(req.params.id, req.body);
+            const course = await courseService.getCourse(req.params.courseid);
+            if (course == null) {
+                res.sendStatus(404);
+            } else if (course.lecturer.id !== req.params.userid) {
+                res.sendStatus(403);
+            } else {
+
+                const updatedCourse = await courseService.updateCourse(req.params.courseid, req.body);
                 if (updatedCourse != null) {
                     res.json(updatedCourse);
                     return;
                 }
             }
-            res.sendStatus(404);
         }
     );
+
+    router.delete('/:courseid',
+        authService.authorize(true),
+        async (req, res) => {
+            const course = await courseService.getCourse(req.params.courseid);
+            if (course == null) {
+                res.sendStatus(404);
+            } else if (course.lecturer.id !== req.params.userid) {
+                res.sendStatus(403);
+            } else {
+                const deletedCourse = await courseService.deleteCourse(req.params.courseid);
+                if (deletedCourse != null) {
+                    res.json(deletedCourse);
+                    return;
+                }
+            }
+        }
+    );
+
+
+    router.use(registerCourseDatesRoutes(app));
+
     return router;
 }
-/**
- * @openapi
- * components:
- *  requestBodies:
- *   CourseDate:
- *    required: true
- *    description: "Date to be added to a course"
- *    content:
- *     application/json:
- *      schema:
- *        type: object
- *        properties:
- *         startdate:
- *          type: string
- *          format: date-time
- *         enddate:
- *          type: string
- *          format: date-time
- *         totalSpots:
- *          type: number
- *          minimum: 1
- *         availableSpots:
- *             type: number
- *             minimum: 0
- *        required:
- *         - startdate
- *         - enddate
- *         - totalSpots
- *   CourseDateBooking:
- *    required: true
- *    description: "Booking to be added to a course date"
- *    content:
- *     application/json:
- *      schema:
- *       type: object
- *       properties:
- *        spots:
- *         type: number
- *         minimum: 1
- *       required:
- *        - spots
- *  parameters:
- *   CourseId:
- *    name: courseid
- *    in: path
- *    required: true
- *    description: "the Id of the course"
- *    schema:
- *     type: number
- *   CourseDateId:
- *    name: dateid
- *    in: path
- *    required: true
- *    description: "the Id of a date the course is being held at"
- *    schema:
- *     type: number
- *   CourseDateBookingId:
- *    name: bookingid
- *    in: path
- *    required: true
- *    description: "the Id of a booking for a course date"
- *    schema:
- *     type: number
- *
- */
+
+

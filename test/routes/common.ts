@@ -7,7 +7,8 @@ import mongodb from 'mongodb';
 import mongoose from 'mongoose';
 import { Express } from 'express';
 import { Course, CourseCategory, User } from '../../src/types';
-import path = require('path');
+import path from 'path';
+import { nanoid } from 'nanoid';
 
 chai.use(chaiHttp);
 chai.use(sinonChai);
@@ -66,7 +67,17 @@ async function setupDB(): Promise<void> {
     await mongoose.connection.collection('courses').insertMany([
         {
             title: 'TEST',
-            dates: [],
+            dates: [{
+                id: nanoid(4),
+                startDate: '2020-11-13T18:00:00+01:00',
+                endDate: '2020-11-13T20:00:00+01:00',
+                totalSpots: 10
+            }, {
+                id: nanoid(4),
+                startDate: '2020-11-20T18:00:00+01:00',
+                endDate: '2020-11-20T20:00:00+01:00',
+                totalSpots: 5
+            }],
             price: 1887,
             description: 'TEST',
             category: new mongodb.ObjectID(insertedCategories.Konferenz),
@@ -103,11 +114,20 @@ async function getDBEntries(): Promise<{ users: Record<string, User>, courses: R
             dates: doc.dates
         } as Course)))))
         .then(courses => courses.reduce((previousValue, currentValue) => {
-            for(const key in currentValue) {
+            const dates = currentValue.dates;
+            currentValue.dates = dates.map(v => ({
+                id: v.id,
+                startDate: v.startDate,
+                endDate: v.endDate,
+                totalSpots: v.totalSpots
+            }));
+
+            for (const key in currentValue) {
                 // eslint-disable-next-line no-prototype-builtins
-                if(currentValue.hasOwnProperty(key))
-                   if(currentValue[key as keyof Course] == null) {
-                    delete currentValue[key as keyof Course];
+                if (currentValue.hasOwnProperty(key)) {
+                    if (currentValue[key as keyof Course] == null) {
+                        delete currentValue[key as keyof Course];
+                    }
                 }
             }
 
@@ -128,12 +148,12 @@ async function disconnectDB(): Promise<void> {
     await mongoose.disconnect();
 }
 
-async function doLogin(app: ChaiHttp.Agent, lecturer = true): Promise<User & {token: string}> {
+async function doLogin(app: ChaiHttp.Agent, lecturer = true): Promise<User & { token: string }> {
     return app.post('/users/login')
         .send({
             username: lecturer ? '002' : '001',
             password: lecturer ? '002' : '001'
-        }).then(res => res.body)
+        }).then(res => res.body);
 }
 
 export default {chai, proxyquire, getApp, disconnectDB, getDBEntries, setupDB, mongoose, doLogin};

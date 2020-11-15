@@ -1,5 +1,6 @@
 import { ValidatorResult } from 'jsonschema';
 import { NextFunction, Request, Response } from 'express';
+import CourseDateBooking from '../models/CourseDateBooking';
 
 export type Environment = 'production' | 'staging' | 'development' | 'test';
 
@@ -54,20 +55,32 @@ export interface SchemaService {
                    additionalSchemas?: string[]): Promise<ValidatorResult>;
 
     validateRequest(schemaName: string, additionalSchemas: string[]): (req: Request, res: Response,
-                                                                        next: NextFunction) => void;
+                                                                       next: NextFunction) => void;
 }
 
-export type UpdateCourse = Omit<Course, 'id' | 'lecturer'> & {lecturer: string};
+export type UpdateCourse = Omit<Course, 'id' | 'lecturer'> & { lecturer: string };
 
 /**
  * Service for managing course instances and related logic
  */
 export interface CourseService {
     getAllCourses(): Promise<Readonly<Course[]>>;
+
     getCourse(id: string): Promise<Course | undefined>;
+
+    deleteCourse(id: string): Promise<Course | undefined>;
+
     getCourseCategories(): Promise<Readonly<CourseCategory[]>>;
+
     updateCourse(id: string, course: Partial<UpdateCourse>): Promise<Course | undefined>;
+
     addCourse(course: UpdateCourse): Promise<Course | undefined>;
+
+    addCourseDate(id: string, date: UpdateCourseDate): Promise<CourseDate | undefined>;
+
+    updateCourseDate(id: string, dateid: string, date: UpdateCourseDate): Promise<CourseDate | undefined>;
+
+    deleteCourseDate(id: string, dateid: string): Promise<CourseDate | undefined>;
 }
 
 /**
@@ -79,9 +92,18 @@ export interface Course {
     description?: string;
     lecturer: User;
     price: number;
-    dates: any[];
+    dates: CourseDate[];
     category: CourseCategory,
     organiser?: string;
+}
+
+export type UpdateCourseDate = Omit<CourseDate, 'id'>;
+
+export interface CourseDate {
+    id: string;
+    startDate: string;
+    endDate: string;
+    totalSpots: number;
 }
 
 /**
@@ -132,6 +154,7 @@ export interface AuthService {
  */
 export interface UserService {
     getUser(username: string): Promise<User | null>;
+
     getUserById(userId: string): Promise<User | null>;
 
     addUser(username: string, password: string, lecturer: boolean): Promise<User>;
@@ -147,4 +170,30 @@ export interface UserService {
     isPasswordValid(userOrUsername: User | string, password: string): Promise<boolean>;
 
 
+}
+
+export interface CourseDateBooking {
+    id: string;
+    user: string;
+    spots: number;
+    course: string;
+    date: string;
+}
+
+export type CourseDateBookingUpdate = Partial<Omit<CourseDateBooking, 'id' | 'user'>>;
+
+export interface BookingService {
+    bookSpots(course: Course, user: User, spots: number, dateId: string): Promise<CourseDateBooking>;
+
+    getBookings(course: Course, user: User): Promise<CourseDateBooking[]>;
+
+    getAllUserBookings(user: User): Promise<CourseDateBooking[]>;
+
+    getBooking(bookingId: string): Promise<CourseDateBooking | undefined>;
+
+    updateBooking(bookingId: string, booking: CourseDateBookingUpdate, user: User): Promise<CourseDateBooking | undefined>;
+
+    deleteBooking(bookingId: string, user: User): Promise<CourseDateBooking | undefined>;
+
+    getOpenSpots(course: Course, dateId: string): Promise<number>;
 }
