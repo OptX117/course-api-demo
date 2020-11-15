@@ -1,5 +1,5 @@
-import * as mongoose from 'mongoose';
-
+import mongoose from 'mongoose';
+import mongodb from 'mongodb'
 /**
  * Represents a booking for a date a course is held at
  *
@@ -29,7 +29,7 @@ import * as mongoose from 'mongoose';
  */
 export const CourseDateBookingSchema = new mongoose.Schema({
     user: {
-        type: 'string',
+        type: mongodb.ObjectId,
         required: true
     },
     spots: {
@@ -38,7 +38,7 @@ export const CourseDateBookingSchema = new mongoose.Schema({
         required: true
     },
     course: {
-        type: 'string',
+        type: mongodb.ObjectId,
         required: true
     },
     date: {

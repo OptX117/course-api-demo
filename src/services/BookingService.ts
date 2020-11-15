@@ -1,6 +1,7 @@
 import { BookingService, Course, CourseDateBooking, CourseDateBookingUpdate, User } from '../types';
 import CourseDateBookingModel from '../models/CourseDateBooking';
 import { MongooseDocument } from 'mongoose';
+import logger from '../winston';
 
 export default class BookingServiceImpl implements BookingService {
     private static convertCourseDateBookingModelToCourseDate(model: MongooseDocument): CourseDateBooking {
@@ -37,10 +38,15 @@ export default class BookingServiceImpl implements BookingService {
     }
 
     public async getBooking(bookingId: string): Promise<CourseDateBooking | undefined> {
-        const found = await CourseDateBookingModel.findOne({_id: bookingId}).exec();
-        if (found) {
-            return BookingServiceImpl.convertCourseDateBookingModelToCourseDate(found);
+        try {
+            const found = await CourseDateBookingModel.findOne({_id: bookingId}).exec();
+            if (found) {
+                return BookingServiceImpl.convertCourseDateBookingModelToCourseDate(found);
+            }
+        } catch (err) {
+           logger.error('Error finding course date booking!', {err});
         }
+
     }
 
     public async getBookings(course: Course, user: User): Promise<CourseDateBooking[]> {

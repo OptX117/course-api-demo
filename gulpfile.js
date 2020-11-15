@@ -196,7 +196,7 @@ gulp.task('fill-db', gulp.series('start-db', 'clear-db', async () => {
                 startDate: '2020-11-13T18:00:00+01:00',
                 endDate: '2020-11-13T20:00:00+01:00',
                 totalSpots: 10
-            },{
+            }, {
                 id: nanoid(4),
                 startDate: '2020-11-20T18:00:00+01:00',
                 endDate: '2020-11-20T20:00:00+01:00',
@@ -207,12 +207,38 @@ gulp.task('fill-db', gulp.series('start-db', 'clear-db', async () => {
             category: new mongodb.ObjectID(insertedCategories.Konferenz),
             lecturer: new mongodb.ObjectID(insertedUsers['002'])
         }]).then(res => res.ops.reduce((previousValue, currentValue) => {
+        previousValue[currentValue.title] = currentValue;
+        return previousValue;
+    }, {}));
+
+    const insertedBookings = await connected.connection.collection('coursedatebookings').insertMany([
+        {
+            course: insertedCourses['TEST']._id,
+            user: insertedUsers['001']._id,
+            spots: 2,
+            date: insertedCourses['TEST'].dates[0].id
+        },
+        {
+            course: insertedCourses['TEST']._id,
+            user: insertedUsers['001']._id,
+            spots: 3,
+            date: insertedCourses['TEST'].dates[1].id
+        },
+        {
+            course: insertedCourses['TEST']._id,
+            user: insertedUsers['003']._id,
+            spots: 1,
+            date: insertedCourses['TEST'].dates[1].id
+        }
+    ]).then(res => res.ops.reduce((previousValue, currentValue) => {
         previousValue[currentValue.name] = currentValue._id;
         return previousValue;
     }, {}));
 
 
-    log.info(`Inserted ${Object.keys(insertedCategories).length} categories, ${Object.keys(insertedUsers).length} users, ${Object.keys(insertedCourses).length} courses.`);
+    log.info(`Inserted ${Object.keys(insertedCategories).length} categories, ${
+        Object.keys(insertedUsers).length} users, ${Object.keys(insertedCourses).length} courses and ${
+        Object.keys(insertedBookings).length} bookings.`);
     connected.disconnect();
     docker.kill();
 }));

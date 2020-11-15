@@ -1,5 +1,5 @@
 import common from './common';
-import { User } from '../../src/types';
+import { CourseDateBooking, User } from '../../src/types';
 import { Express } from 'express';
 
 const {chai, getApp, disconnectDB, getDBEntries, setupDB} = common;
@@ -7,7 +7,7 @@ const {expect} = chai;
 
 let app: Express;
 let users: Record<string, User>;
-
+let bookings: CourseDateBooking[];
 describe('/users', () => {
     before(async () => {
         app = await getApp();
@@ -19,6 +19,7 @@ describe('/users', () => {
         await setupDB();
         const dbEntries = await getDBEntries();
         users = dbEntries.users;
+        bookings = dbEntries.bookings;
     });
 
     describe('/me', () => {
@@ -151,6 +152,41 @@ describe('/users', () => {
                         expect(res).to.not.be.json;
                         expect(res.body).to.eql({});
                     });
+            });
+        });
+    });
+
+    describe('/users/bookings', () => {
+        describe('GET', () => {
+            it('should return all bookings of the current user', () => {
+                const agent = chai.request.agent(app);
+                return agent.post('/users/login')
+                    .send({
+                        username: '001',
+                        password: '001'
+                    })
+                    .then(res => res.body)
+                    .then(user => {
+                        return agent.get('/users/bookings')
+                            .send()
+                            .set('Authorization',
+                                `Bearer ${user.token}`)
+                            .then(res => {
+                                expect(res).to.have.status(200);
+                                expect(res).to.be.json;
+                                expect(res.body).to.eql(bookings.filter(b => b.user === users['001'].id));
+                            });
+                    }).finally(() => agent.close());
+            });
+            it('should not return all bookings if the user is unauthorized', () => {
+                const agent = chai.request.agent(app);
+                return agent.get('/users/bookings')
+                    .send()
+                    .then(res => {
+                        expect(res).to.have.status(403);
+                        expect(res).to.not.be.json;
+                        expect(res.body).to.eql({});
+                    }).finally(() => agent.close());
             });
         });
     });

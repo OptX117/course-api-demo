@@ -15,6 +15,7 @@ import UserServiceImpl from './services/UserService';
 import AuthServiceImpl from './services/AuthService';
 
 import registerRoutes from './routes';
+import BookingServiceImpl from './services/BookingService';
 
 
 /**
@@ -58,12 +59,14 @@ export default async function initApplication(configFolder: string,
     const userService = new UserServiceImpl();
     const authService = new AuthServiceImpl(userService, configService);
     const courseService = new CourseServiceImpl(userService);
+    const bookingService = new BookingServiceImpl();
 
     app.set(Constants.ConfigurationService, configService);
     app.set(Constants.SchemaValidationService, validationService);
     app.set(Constants.CourseService, courseService);
     app.set(Constants.UserService, userService);
     app.set(Constants.AuthorizationService, authService);
+    app.set(Constants.BookingService, bookingService);
 
     app.use(registerRoutes(app));
 

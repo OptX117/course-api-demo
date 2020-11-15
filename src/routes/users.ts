@@ -1,5 +1,5 @@
 import { Express, Router } from 'express';
-import { AuthService, SchemaService, UserService } from '../types';
+import { AuthService, BookingService, SchemaService, User, UserService } from '../types';
 import Constants from '../constants';
 
 export default function (app: Express): Router {
@@ -7,6 +7,7 @@ export default function (app: Express): Router {
     const userService: UserService = app.get(Constants.UserService);
     const authService: AuthService = app.get(Constants.AuthorizationService);
     const schemaService: SchemaService = app.get(Constants.SchemaValidationService);
+    const bookingService: BookingService = app.get(Constants.BookingService);
 
     /**
      * @openapi
@@ -98,6 +99,34 @@ export default function (app: Express): Router {
             } else {
                 res.sendStatus(401);
             }
+        });
+
+    /**
+     * @openapi
+     * /users/bookings:
+     *   get:
+     *    operationId: getCurrentUser
+     *    tags:
+     *     - Users
+     *    summary: "Get the currently logged in user"
+     *    responses:
+     *     200:
+     *      description: "OK - all bookings of currently logged in user"
+     *      content:
+     *       application/json:
+     *        schema:
+     *         type: array
+     *         items:
+     *          $ref: "#/components/schemas/CourseDateBooking"
+     *     4XX:
+     *      description: "unauthorized, not logged in"
+     *    security:
+     *     - cookieAuth: []
+     *     - bearerAuth: []
+     */
+    router.get('/bookings',
+        authService.authorize(), async (req, res) => {
+            res.json(await bookingService.getAllUserBookings(await userService.getUserById(req.params.userid) as User));
         });
 
     return router;

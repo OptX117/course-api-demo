@@ -4,5 +4,6 @@ export default {
     "Logger": "logger",
     "CourseService": "courseservice",
     "UserService": "userservice",
-    "AuthorizationService": "authservice"
+    "AuthorizationService": "authservice",
+    "BookingService": "bookingservice"
 }

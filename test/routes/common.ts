@@ -6,7 +6,7 @@ import initApplication from '../../src/app';
 import mongodb from 'mongodb';
 import mongoose from 'mongoose';
 import { Express } from 'express';
-import { Course, CourseCategory, User } from '../../src/types';
+import { Course, CourseCategory, CourseDateBooking, User } from '../../src/types';
 import path from 'path';
 import { nanoid } from 'nanoid';
 
@@ -64,7 +64,7 @@ async function setupDB(): Promise<void> {
         return previousValue;
     }, {}));
 
-    await mongoose.connection.collection('courses').insertMany([
+    const insertedCourses = await mongoose.connection.collection('courses').insertMany([
         {
             title: 'TEST',
             dates: [{
@@ -84,12 +84,36 @@ async function setupDB(): Promise<void> {
             lecturer: new mongodb.ObjectID(insertedUsers['002']),
             organiser: 'TEST'
         }]).then(res => res.ops.reduce((previousValue, currentValue) => {
-        previousValue[currentValue.name] = currentValue._id;
+        previousValue[currentValue.title] = currentValue;
+        return previousValue;
+    }, {}));
+
+    await mongoose.connection.collection('coursedatebookings').insertMany([
+        {
+            course: insertedCourses['TEST']._id,
+            user: insertedUsers['001']._id,
+            spots: 2,
+            date: insertedCourses['TEST'].dates[0].id
+        },
+        {
+            course: insertedCourses['TEST']._id,
+            user: insertedUsers['001']._id,
+            spots: 3,
+            date: insertedCourses['TEST'].dates[1].id
+        },
+        {
+            course: insertedCourses['TEST']._id,
+            user: insertedUsers['003']._id,
+            spots: 1,
+            date: insertedCourses['TEST'].dates[1].id
+        }
+    ]).then(res => res.ops.reduce((previousValue, currentValue) => {
+        previousValue[currentValue.id] = currentValue._id;
         return previousValue;
     }, {}));
 }
 
-async function getDBEntries(): Promise<{ users: Record<string, User>, courses: Record<string, Course>, courseCategories: CourseCategory[] }> {
+async function getDBEntries(): Promise<{ users: Record<string, User>, courses: Record<string, Course>, courseCategories: CourseCategory[], bookings: CourseDateBooking[] }> {
     const users = await mongoose.models.User.find().exec().then(docs => docs.map(doc => ({
         id: doc._id.toString(),
         name: doc.name,
@@ -140,7 +164,19 @@ async function getDBEntries(): Promise<{ users: Record<string, User>, courses: R
         return previousValue;
     }, []));
 
-    return {users, courses, courseCategories};
+    const bookings = await mongoose.models.CourseDateBooking.find().exec().then(docs => docs.reduce((previousValue,
+                                                                                                     currentValue) => {
+        previousValue.push({
+            user: currentValue.user.toString(),
+            date: currentValue.date,
+            id: currentValue._id.toString(),
+            spots: currentValue.spots,
+            course: currentValue.course.toString()
+        } as CourseDateBooking);
+        return previousValue;
+    }, []));
+
+    return {users, courses, courseCategories, bookings};
 }
 
 async function disconnectDB(): Promise<void> {

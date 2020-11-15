@@ -1,7 +1,7 @@
 import { Express, Router } from 'express';
 import Constants from '../constants';
 import { AuthService, CourseDate, CourseService, SchemaService } from '../types';
-
+import registerCourseDateBookingsRoutes from './coursedatebookings';
 /**
  * Registers all routes under /courses/:id/dates
  * @param {e.Express} app
@@ -300,6 +300,9 @@ export default function (app: Express): Router {
                 }
             }
         });
+
+
+    router.use(registerCourseDateBookingsRoutes(app));
 
 
     return router;
