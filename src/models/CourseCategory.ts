@@ -12,11 +12,11 @@ import * as mongoose from 'mongoose';
  *
  * @type {module:mongoose.Schema<any>}
  */
-const courseCategorySchema = new mongoose.Schema({
+export const CourseCategorySchema = new mongoose.Schema({
     name: {
         type: 'string',
         enum: ['Konferenz', 'Sprachkurs', 'Meeting', 'Weiterbildung']
     }
 });
 
-export default mongoose.model('CourseCategory', courseCategorySchema);
+export default mongoose.model('CourseCategory', CourseCategorySchema);

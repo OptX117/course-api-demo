@@ -33,6 +33,14 @@ describe('AuthService', () => {
             },
             getAllUsers(): Promise<User[]> {
                 return (this.getUser('TEST') as Promise<User>).then(val => [val]);
+            },
+            getUserById(userId: string): Promise<User | null> {
+                return Promise.resolve({
+                    name: 'TEST',
+                    isLecturer: false,
+                    id: userId
+                });
+
             }
         } as UserService;
         configService = {
@@ -189,6 +197,7 @@ describe('AuthService', () => {
         });
 
         it('should return the user and a token if both match', async () => {
+
             proxyStubs.sign.returns('test');
 
             expect(await service.logIn('test', 'test')).to.eql({
@@ -197,7 +206,13 @@ describe('AuthService', () => {
                 isLecturer: false,
                 token: 'test'
             });
+
+            expect(proxyStubs.sign).to.have.been.calledWith({
+                name: 'test',
+                lecturer: false
+            }, 'TEST', {expiresIn: '1h', subject: 'TEST', issuer: 'CourseDemoApp'});
         });
+
     });
 
     describe('checkUsername', () => {
@@ -231,6 +246,7 @@ describe('AuthService', () => {
 
                 expect(next).to.have.been.calledOnce;
                 expect(request.params.username).to.be.eql('Test');
+                expect(request.params.userid).to.be.eql('Test');
             });
 
             it('should add the username if jwt token is present in authorization header', async () => {
@@ -256,6 +272,8 @@ describe('AuthService', () => {
 
                 expect(next).to.have.been.calledOnce;
                 expect(request.params.username).to.be.eql('Test');
+                expect(request.params.userid).to.be.eql('Test');
+
             });
 
             it('should not add a username if jwt token in neither cookie nor authorization header', async () => {
@@ -281,6 +299,7 @@ describe('AuthService', () => {
 
                 expect(next).to.have.been.calledOnce;
                 expect(request.params.username).to.be.undefined;
+                expect(request.params.userid).to.be.undefined;
             });
 
             it('should not add a username if authorization header is not set to bearer', async () => {
@@ -306,6 +325,7 @@ describe('AuthService', () => {
 
                 expect(next).to.have.been.calledOnce;
                 expect(request.params.username).to.be.undefined;
+                expect(request.params.userid).to.be.undefined;
             });
         });
     });

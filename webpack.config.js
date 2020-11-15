@@ -1,11 +1,8 @@
 const path = require('path');
 const nodeExternals = require('webpack-node-externals');
 
-
-
 module.exports = {
-    // Change to your "entry-point".
-    entry: './src/app',
+    entry: './src/index',
     target: 'node',
     mode: process.env.NODE_ENV || 'production',
     node: {

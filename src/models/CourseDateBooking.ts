@@ -23,7 +23,7 @@ import * as mongoose from 'mongoose';
  *
  * @type {module:mongoose.Schema<any>}
  */
-const courseDateBookingSchema = new mongoose.Schema({
+export const CourseDateBookingSchema = new mongoose.Schema({
     user: {
         type: 'string',
         required: true
@@ -35,4 +35,4 @@ const courseDateBookingSchema = new mongoose.Schema({
     }
 });
 
-export default mongoose.model('CourseDateBooking', courseDateBookingSchema);
+export default mongoose.model('CourseDateBooking', CourseDateBookingSchema);

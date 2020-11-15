@@ -33,7 +33,7 @@ import * as mongoose from 'mongoose';
  *
  * @type {module:mongoose.Schema<any>}
  */
-const courseDateSchema = new mongoose.Schema({
+export const CourseDateSchema = new mongoose.Schema({
     startdate: {
         type: 'string',
         format: 'date-time',
@@ -48,11 +48,8 @@ const courseDateSchema = new mongoose.Schema({
         type: 'number',
         min: 1,
         required: true
-    },
-    availableSpots: {
-        type: 'number',
-        min: 0
     }
 });
 
-export default mongoose.model('CourseDate', courseDateSchema);
+export default mongoose.model('CourseDate', CourseDateSchema);
+

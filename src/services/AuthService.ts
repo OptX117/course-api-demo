@@ -13,7 +13,7 @@ export default class AuthServiceImpl implements AuthService {
         this.configService = configService;
     }
 
-    public authorize(hasToBeLecturer = false, name?: string): (req: Request, res: Response,
+    public authorize(hasToBeLecturer = false): (req: Request, res: Response,
                                                                next: NextFunction) => Promise<void> {
         return async (req, res, next) => {
             const jwtCookie = req.cookies['jsession'];
@@ -23,9 +23,10 @@ export default class AuthServiceImpl implements AuthService {
                 res.sendStatus(403);
             } else {
                 const jwt = jwtCookie || (jwtHeader || '').replace(/^bearer\s/gim, '');
-                await this.verifyWebToken(jwt, hasToBeLecturer, name).then((res) => {
+                await this.verifyWebToken(jwt, hasToBeLecturer).then((res) => {
                     try {
                         req.params.username = res.name;
+                        req.params.userid = res.id;
                         next();
                     } catch (err) {
                         next(err);
@@ -48,6 +49,7 @@ export default class AuthServiceImpl implements AuthService {
                 await this.verifyWebToken(jwt).then((res) => {
                     try {
                         req.params.username = res.name;
+                        req.params.userid = res.id;
                         next();
                     } catch (err) {
                         next(err);

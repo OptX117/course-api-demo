@@ -48,6 +48,27 @@ export default class UserServiceImpl implements UserService {
         }
     }
 
+    async getUserById(userId: string): Promise<User | null> {
+        const internalUser = (await UserModel.findOne({_id: userId}).exec().then(value => {
+            if (value != null) {
+                return value as unknown as InternalUser;
+            }
+            return null;
+        }));
+
+        if (internalUser != null) {
+            {
+                return {
+                    name: internalUser.name,
+                    isLecturer: internalUser.isLecturer,
+                    id: internalUser._id.toString()
+                };
+            }
+        } else {
+            return null;
+        }
+    }
+
     async isPasswordValid(userOrUsername: User | string, password: string): Promise<boolean> {
         const user = await (typeof userOrUsername ===
                             'string' ? this.getInternalUser(userOrUsername) : this.getInternalUser(

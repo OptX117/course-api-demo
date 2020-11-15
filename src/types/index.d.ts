@@ -57,20 +57,24 @@ export interface SchemaService {
                                                                         next: NextFunction) => void;
 }
 
+export type UpdateCourse = Omit<Course, 'id' | 'lecturer'> & {lecturer: string};
+
 /**
  * Service for managing course instances and related logic
  */
 export interface CourseService {
-    getAllCourses(): Readonly<Course[]>;
-
-    addCourse(course: Omit<Course, 'id'>): Course;
+    getAllCourses(): Promise<Readonly<Course[]>>;
+    getCourse(id: string): Promise<Course | undefined>;
+    getCourseCategories(): Promise<Readonly<CourseCategory[]>>;
+    updateCourse(id: string, course: Partial<UpdateCourse>): Promise<Course | undefined>;
+    addCourse(course: UpdateCourse): Promise<Course | undefined>;
 }
 
 /**
  * Represents a single course
  */
 export interface Course {
-    id: number;
+    id: string;
     title: string;
     description?: string;
     lecturer: User;
@@ -93,7 +97,8 @@ export type CourseCategory =
     'Konferenz' |
     'Sprachkurs' |
     'Meeting' |
-    'Weiterbildung';
+    'Weiterbildung' |
+    'N/A';
 
 /**
  * Service for authorizing requests and authenticating users
@@ -102,9 +107,8 @@ export interface AuthService {
     /**
      * Check if a request contains a valid JWT in a same-site strict and secure cookie or in the Authorization header
      * @param hasToBeLecturer {boolean | undefined} Whether or not user in token has to be lecturer
-     * @param name {string | undefined} The name that has to be present in token
      */
-    authorize(hasToBeLecturer?: boolean, name?: string): (req: Request, res: Response, next: NextFunction) => void;
+    authorize(hasToBeLecturer?: boolean): (req: Request, res: Response, next: NextFunction) => void;
 
     /**
      * Log in a user with given username and password.
@@ -128,6 +132,7 @@ export interface AuthService {
  */
 export interface UserService {
     getUser(username: string): Promise<User | null>;
+    getUserById(userId: string): Promise<User | null>;
 
     addUser(username: string, password: string, lecturer: boolean): Promise<User>;
 

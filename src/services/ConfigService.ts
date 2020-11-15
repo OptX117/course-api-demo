@@ -14,6 +14,8 @@ export default class ConfigurationServiceImpl implements ConfigurationService {
 
     /**
      * @param {string} configPath The path to load as configuration.<br>Should be <code>path.join(process.cwd(), 'config', 'config.json')</code>, except for testing.
+     * @param {string} openApiDefinitionPath The path to load as openapi definition<br>Should be <code>path.join(process.cwd(), 'config', 'openapi.json')</code>, except for testing.
+     * @param {SchemaService} schemaService The schema service to use for validating the options.json file.
      */
     constructor(configPath: string, openApiDefinitionPath: string, schemaService: SchemaService) {
         this.configPath = configPath;
@@ -25,7 +27,7 @@ export default class ConfigurationServiceImpl implements ConfigurationService {
         if (this.config != null) {
             return Object.freeze(this.config);
         } else {
-            logger.info('Loading configuration');
+            logger.info(`Loading configuration from path ${this.configPath}.`);
             try {
                 const possibleConfig = JSON.parse((await fs.readFile(this.configPath)).toString());
                 const validationResults = await this.schemaService.validateSchema(possibleConfig, 'config.schema.json');
@@ -62,7 +64,7 @@ export default class ConfigurationServiceImpl implements ConfigurationService {
         if (this.openApiDefinition != null) {
             return Object.freeze(this.openApiDefinition);
         } else {
-            logger.info('Loading OpenAPI definition!');
+            logger.info(`Loading OpenAPI definition from path ${this.openApiDefinitionPath}.`);
             try {
                 return await fs.readFile(this.openApiDefinitionPath).then(res => JSON.parse(res.toString()));
             } catch (err) {

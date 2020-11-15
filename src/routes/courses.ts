@@ -1,6 +1,6 @@
 import { Express, Router } from 'express';
 import Constants from '../constants';
-import { CourseService } from '../types';
+import { AuthService, Course, CourseService, SchemaService } from '../types';
 
 /**
  * Registers all routes under /courses
@@ -53,7 +53,7 @@ import { CourseService } from '../types';
  *        description:
  *         type: string
  *        lecturer:
- *         type: number
+ *         type: string
  *        price:
  *         type: number
  *        dates:
@@ -69,10 +69,37 @@ import { CourseService } from '../types';
  *        - lecturer
  *        - price
  *        - category
+ *   CourseChange:
+ *    required: true
+ *    description: "Changes to be made to the course"
+ *    content:
+ *     application/json:
+ *      schema:
+ *       type: object
+ *       properties:
+ *        title:
+ *         type: string
+ *        description:
+ *         type: string
+ *        lecturer:
+ *         type: string
+ *        price:
+ *         type: number
+ *        dates:
+ *         type: array
+ *         items:
+ *          $ref: "#/components/schemas/CourseDate"
+ *        category:
+ *          $ref: "#/components/schemas/CourseCategory"
+ *        organiser:
+ *         type: string
+ *       additionalProperties: false
  */
 export default function (app: Express): Router {
     const router = Router();
     const courseService: CourseService = app.get(Constants.CourseService);
+    const authService: AuthService = app.get(Constants.AuthorizationService);
+    const schemaService: SchemaService = app.get(Constants.SchemaValidationService);
 
     /**
      * @openapi
@@ -114,9 +141,9 @@ export default function (app: Express): Router {
      *          parameters:
      *           courseid: "$response.body#/*\/id"
      */
-    router.get('/', (req, res) => {
+    router.get('/', async (req, res) => {
         res.status(200);
-        res.json(courseService.getAllCourses());
+        res.json(await courseService.getAllCourses());
     });
 
     /**
@@ -147,10 +174,100 @@ export default function (app: Express): Router {
      *        parameters:
      *         courseid: $response.body#/id
      */
-    router.post('/', (req, res) => {
-        // Return nothing for now
-        res.sendStatus(204);
+    router.post('/',
+        authService.authorize(true),
+        schemaService.validateRequest('course.requestbody.schema.json', ['./']),
+        async (req, res) => {
+            const newCourse = req.body as Omit<Course, 'id' | 'lecturer'> & { lecturer: string };
+            // Return nothing for now
+            const savedCourse = await courseService.addCourse(newCourse);
+            if (savedCourse != null) {
+                res.json(savedCourse);
+            } else {
+                res.sendStatus(400);
+            }
+        });
+
+    /**
+     * @openapi
+     *  /courses/{courseid}:
+     *   parameters:
+     *   - $ref: "#/components/parameters/CourseId"
+     *   get:
+     *    operationId: getCourse
+     *    tags:
+     *      - Courses
+     *    summary: "Get a single course"
+     *    responses:
+     *     200:
+     *      description: "the course"
+     *      content:
+     *       application/json:
+     *        schema:
+     *         $ref: "#/components/schemas/Course"
+     *      links:
+     *       getCourseDates:
+     *        operationId: getCourseDates
+     *        parameters:
+     *         courseid: $response.body#/id
+     *       getCourseDate:
+     *        operationId: getCourseDate
+     *        parameters:
+     *         courseid: $response.body#/id
+     *     404:
+     *      description: "Not Found - Course does not exist"
+     */
+    router.get('/:id', async (req, res) => {
+        const course = await courseService.getCourse(req.params.id);
+        if (course != null) {
+            res.json(course);
+        } else {
+            res.sendStatus(404);
+        }
     });
+
+    /**
+     * @openapi
+     * /courses/{courseid}:
+     *  parameters:
+     *   - $ref: "#/components/parameters/CourseId"
+     *  put:
+     *    operationId: updateCourse
+     *    tags:
+     *     - Courses
+     *    summary: "Update a single course"
+     *    requestBody:
+     *     $ref: "#/components/requestBodies/CourseChange"
+     *    responses:
+     *     404:
+     *      description: "Not Found - Course does not exist"
+     *     4XX:
+     *      description: "unauthorized, log in as lecturer of the course first"
+     *     200:
+     *      description: "the updated course"
+     *      content:
+     *       application/json:
+     *        schema:
+     *         $ref: "#/components/schemas/Course"
+     *    security:
+     *     - cookieAuth: []
+     *     - bearerAuth: []
+     */
+    router.put('/:id',
+        authService.authorize(true),
+        schemaService.validateRequest('coursechange.requestbody.schema.json', ['./']),
+        async (req, res) => {
+            const course = await courseService.getCourse(req.params.id);
+            if (course != null && course.lecturer.id === req.params.userid) {
+                const updatedCourse = await courseService.updateCourse(req.params.id, req.body);
+                if (updatedCourse != null) {
+                    res.json(updatedCourse);
+                    return;
+                }
+            }
+            res.sendStatus(404);
+        }
+    );
     return router;
 }
 /**
