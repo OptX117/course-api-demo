@@ -263,3 +263,10 @@ gulp.task('watch', gulp.series('build', 'start-db', 'start', () => {
         cb();
     }, 'build', 'start'));
 }));
+
+gulp.task('serve-frontend', gulp.parallel('watch', () => {
+    const frontend = spawn('npm', ['run', 'serve'], {
+        cwd: path.join(__dirname, 'web'),
+        stdio: 'inherit'
+    });
+}));
