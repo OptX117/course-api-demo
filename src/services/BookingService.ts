@@ -49,14 +49,14 @@ export default class BookingServiceImpl implements BookingService {
 
     }
 
-    public async getBookings(course: Course, user: User): Promise<CourseDateBooking[]> {
-        if (user.isLecturer && course.lecturer.id === user.id) {
+    public async getBookings(course: Course, userOrAll: User | true): Promise<CourseDateBooking[]> {
+        if (userOrAll === true || userOrAll.isLecturer && course.lecturer.id === userOrAll.id) {
             return await CourseDateBookingModel.find({course: course.id}).exec()
                 .then(list => list.map(el => BookingServiceImpl.convertCourseDateBookingModelToCourseDate(el)));
         } else {
             return await CourseDateBookingModel.find({
                 course: course.id,
-                user: user.id
+                user: userOrAll.id
             }).exec().then(list => list.map(el => BookingServiceImpl.convertCourseDateBookingModelToCourseDate(el)));
         }
     }
@@ -82,10 +82,12 @@ export default class BookingServiceImpl implements BookingService {
     }
 
     public async getOpenSpots(course: Course, dateId: string): Promise<number> {
-        return CourseDateBookingModel.count({
+        return CourseDateBookingModel.find({
             date: dateId,
             course: course.id
-        }).exec();
+        }).exec()
+            .then(ret => ret.map(val => (val as any).spots))
+            .then(ret => ret.reduce((previousValue, currentValue) => previousValue + currentValue, 0));
     }
 
     public getAllUserBookings(user: User): Promise<CourseDateBooking[]> {

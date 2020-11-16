@@ -1,6 +1,6 @@
 import { Express, Router } from 'express';
 import Constants from '../constants';
-import { AuthService, CourseDate, CourseService, SchemaService } from '../types';
+import { AuthService, BookingService, CourseDate, CourseService, SchemaService } from '../types';
 import registerCourseDateBookingsRoutes from './coursedatebookings';
 /**
  * Registers all routes under /courses/:id/dates
@@ -62,6 +62,7 @@ export default function (app: Express): Router {
     const courseService: CourseService = app.get(Constants.CourseService);
     const authService: AuthService = app.get(Constants.AuthorizationService);
     const schemaService: SchemaService = app.get(Constants.SchemaValidationService);
+    const bookingService: BookingService = app.get(Constants.BookingService);
 
     /**
      * @openapi
@@ -89,6 +90,10 @@ export default function (app: Express): Router {
     router.get('/:courseid/dates', async (req, res) => {
         const course = await courseService.getCourse(req.params.courseid);
         if (course != null) {
+            const dates = course.dates;
+            for (const date of dates) {
+                (date as any).availableSpots = await bookingService.getOpenSpots(course, date.id);
+            }
             res.json(course.dates);
         } else {
             res.sendStatus(404);
@@ -188,6 +193,7 @@ export default function (app: Express): Router {
         if (course != null) {
             const date = course.dates.find(date => date.id === req.params.dateid);
             if (date != null) {
+                (date as any).availableSpots = await bookingService.getOpenSpots(course, date.id);
                 res.json(date);
                 return;
             }

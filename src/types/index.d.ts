@@ -185,7 +185,7 @@ export type CourseDateBookingUpdate = Partial<Omit<CourseDateBooking, 'id' | 'us
 export interface BookingService {
     bookSpots(course: Course, user: User, spots: number, dateId: string): Promise<CourseDateBooking>;
 
-    getBookings(course: Course, user: User): Promise<CourseDateBooking[]>;
+    getBookings(course: Course, userOrAll: User | true): Promise<CourseDateBooking[]>;
 
     getAllUserBookings(user: User): Promise<CourseDateBooking[]>;
 

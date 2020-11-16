@@ -1,4 +1,5 @@
 import {
+    BookingService,
     Course,
     CourseCategory,
     CourseDate,
@@ -215,5 +216,4 @@ export default class CourseServiceImpl implements CourseService {
             title: el.title
         };
     }
-
 }

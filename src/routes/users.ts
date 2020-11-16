@@ -49,7 +49,7 @@ export default function (app: Express): Router {
      * paths:
      *  /users/login:
      *   post:
-     *    operationId: logIn
+     *    operationId: getUserInfo
      *    tags:
      *     - Users
      *    summary: "Log in"

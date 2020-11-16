@@ -58,8 +58,9 @@ export default async function initApplication(configFolder: string,
 
     const userService = new UserServiceImpl();
     const authService = new AuthServiceImpl(userService, configService);
-    const courseService = new CourseServiceImpl(userService);
     const bookingService = new BookingServiceImpl();
+    const courseService = new CourseServiceImpl(userService);
+
 
     app.set(Constants.ConfigurationService, configService);
     app.set(Constants.SchemaValidationService, validationService);
