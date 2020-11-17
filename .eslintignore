@@ -3,3 +3,4 @@ bin
 config
 gulpfile.js
 webpack.config.js
+web/test

@@ -14,7 +14,7 @@ export default class AuthServiceImpl implements AuthService {
     }
 
     public authorize(hasToBeLecturer = false): (req: Request, res: Response,
-                                                               next: NextFunction) => Promise<void> {
+                                                next: NextFunction) => Promise<void> {
         return async (req, res, next) => {
             const jwtCookie = req.cookies['jsession'];
             const jwtHeader = req.header('Authorization');
@@ -25,6 +25,10 @@ export default class AuthServiceImpl implements AuthService {
                 const jwt = jwtCookie || (jwtHeader || '').replace(/^bearer\s/gim, '');
                 await this.verifyWebToken(jwt, hasToBeLecturer).then((res) => {
                     try {
+                        if (res == null) {
+                            next(new Error('Token invalid!'));
+                            return;
+                        }
                         req.params.username = res.name;
                         req.params.userid = res.id;
                         next();
@@ -48,13 +52,17 @@ export default class AuthServiceImpl implements AuthService {
                 const jwt = jwtCookie || (jwtHeader || '').replace(/^bearer\s/gim, '');
                 await this.verifyWebToken(jwt).then((res) => {
                     try {
-                        req.params.username = res.name;
-                        req.params.userid = res.id;
+                        if (res) {
+                            req.params.username = res.name;
+                            req.params.userid = res.id;
+                        }
                         next();
                     } catch (err) {
                         next(err);
                     }
-                }, err => next(err));
+                }, err => {
+                    next(err);
+                });
             }
         };
     }
@@ -77,7 +85,7 @@ export default class AuthServiceImpl implements AuthService {
      * @returns {Promise<boolean>}
      * @private
      */
-    private async verifyWebToken(token: string, hasToBeLecturer = false, name?: string): Promise<User> {
+    private async verifyWebToken(token: string, hasToBeLecturer = false, name?: string): Promise<User | undefined> {
         if (!this.secretKey) {
             this.secretKey = (await this.configService.getConfiguration()).jwt;
         }
@@ -94,6 +102,9 @@ export default class AuthServiceImpl implements AuthService {
                 };
             }
         } catch (err) {
+            if (err.name === 'TokenExpiredError') {
+                return;
+            }
             logger.error('Error decoding JWT token!', {err});
         }
 

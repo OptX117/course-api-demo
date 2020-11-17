@@ -152,7 +152,19 @@ export default function (app: Express): Router {
      */
     router.get('/', async (req, res) => {
         res.status(200);
-        res.json(await courseService.getAllCourses());
+
+        const start = Array.isArray(req.query.start) ? req.query.start[0] : req.query.start;
+        if(start && typeof start !== 'string') {
+            res.status(400);
+            return;
+        }
+        const end = Array.isArray(req.query.end) ? req.query.end[0] : req.query.end;
+        if(end && typeof end !== 'string') {
+            res.status(400);
+            return;
+        }
+
+        res.json(await courseService.getAllCourses(start, end));
     });
 
     /**

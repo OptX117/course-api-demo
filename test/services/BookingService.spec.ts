@@ -97,7 +97,8 @@ describe('BookingService', () => {
                     id: 'TEST',
                     startDate: '2020-11-28T18:00:00+01:00',
                     endDate: '2020-11-28T20:00:00+01:00',
-                    totalSpots: 7
+                    totalSpots: 7,
+                    location: 'Up'
                 }],
                 lecturer: user,
                 organiser: 'ICH',
@@ -152,7 +153,8 @@ describe('BookingService', () => {
                         id: 'TEST',
                         startDate: '2020-11-28T18:00:00+01:00',
                         endDate: '2020-11-28T20:00:00+01:00',
-                        totalSpots: 7
+                        totalSpots: 7,
+                        location: 'THE MOON'
                     }],
                     lecturer: user,
                     organiser: 'ICH',
@@ -208,7 +210,8 @@ describe('BookingService', () => {
                     id: 'TEST',
                     startDate: '2020-11-28T18:00:00+01:00',
                     endDate: '2020-11-28T20:00:00+01:00',
-                    totalSpots: 7
+                    totalSpots: 7,
+                    location: 'MARS'
                 }],
                 lecturer: user,
                 organiser: 'ICH',
@@ -269,7 +272,8 @@ describe('BookingService', () => {
                     id: 'TEST',
                     startDate: '2020-11-28T18:00:00+01:00',
                     endDate: '2020-11-28T20:00:00+01:00',
-                    totalSpots: 7
+                    totalSpots: 7,
+                    location: 'Next door'
                 }],
                 lecturer: user,
                 organiser: 'ICH',

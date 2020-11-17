@@ -2,6 +2,7 @@ import { BookingService, Course, CourseDateBooking, CourseDateBookingUpdate, Use
 import CourseDateBookingModel from '../models/CourseDateBooking';
 import { MongooseDocument } from 'mongoose';
 import logger from '../winston';
+import CourseDate from '../models/CourseDate';
 
 export default class BookingServiceImpl implements BookingService {
     private static convertCourseDateBookingModelToCourseDate(model: MongooseDocument): CourseDateBooking {
@@ -82,12 +83,14 @@ export default class BookingServiceImpl implements BookingService {
     }
 
     public async getOpenSpots(course: Course, dateId: string): Promise<number> {
+        const date = course.dates.find(date => date.id === dateId);
         return CourseDateBookingModel.find({
             date: dateId,
             course: course.id
         }).exec()
             .then(ret => ret.map(val => (val as any).spots))
-            .then(ret => ret.reduce((previousValue, currentValue) => previousValue + currentValue, 0));
+            .then(ret => ret.reduce((previousValue, currentValue) => previousValue + currentValue, 0))
+            .then(ret => date ? (date as any).totalSpots - ret : 0);
     }
 
     public getAllUserBookings(user: User): Promise<CourseDateBooking[]> {

@@ -20,6 +20,8 @@ import mongodb from 'mongodb'
  *      type: string
  *     date:
  *      type: string
+ *     location:
+ *      type: string
  *    required:
  *     - id
  *     - user
@@ -44,6 +46,10 @@ export const CourseDateBookingSchema = new mongoose.Schema({
     date: {
         type: 'string',
         required: true
+    },
+    location: {
+        type: 'string',
+        retuired: true
     }
 });
 

@@ -64,7 +64,7 @@ export type UpdateCourse = Omit<Course, 'id' | 'lecturer'> & { lecturer: string 
  * Service for managing course instances and related logic
  */
 export interface CourseService {
-    getAllCourses(): Promise<Readonly<Course[]>>;
+    getAllCourses(startDate?: string, endDate?: string): Promise<Readonly<Course[]>>;
 
     getCourse(id: string): Promise<Course | undefined>;
 
@@ -104,6 +104,7 @@ export interface CourseDate {
     startDate: string;
     endDate: string;
     totalSpots: number;
+    location: string;
 }
 
 /**

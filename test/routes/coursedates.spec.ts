@@ -45,7 +45,8 @@ describe('/courses/:id/dates', () => {
             const courseDateInput: UpdateCourseDate = {
                 startDate: '2020-11-28T18:00:00+01:00',
                 endDate: '2020-11-28T20:00:00+01:00',
-                totalSpots: 7
+                totalSpots: 7,
+                location: 'THE MOON'
             };
 
             return chai.request(app)
@@ -68,7 +69,8 @@ describe('/courses/:id/dates', () => {
             const courseDateInput: UpdateCourseDate = {
                 startDate: '2020-11-28T18:00:00+01:00',
                 endDate: '2020-11-28T20:00:00+01:00',
-                totalSpots: 7
+                totalSpots: 7,
+                location: 'DOWN'
             };
 
             return chai.request(app)
@@ -92,7 +94,8 @@ describe('/courses/:id/dates', () => {
             const courseDateInput: UpdateCourseDate = {
                 startDate: '2020-11-28T18:00:00+01:00',
                 endDate: '2020-11-28T20:00:00+01:00',
-                totalSpots: 7
+                totalSpots: 7,
+                location: 'MARS'
             };
 
             const agent = chai.request.agent(app);

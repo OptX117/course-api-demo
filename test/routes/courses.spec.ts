@@ -1,6 +1,7 @@
 import common from './common';
 import { Course, CourseCategory, User } from '../../src/types';
 import { Express } from 'express';
+import moment from 'moment';
 
 const {chai, getApp, disconnectDB, getDBEntries, setupDB, doLogin} = common;
 const {expect} = chai;
@@ -36,6 +37,84 @@ describe('/courses', () => {
 
                     const body = res.body;
                     expect(body).to.eql(Object.values(courses));
+                });
+        });
+
+        it('should return courses before end date if specified', () => {
+            return chai.request(app)
+                .get(`/courses?end=${courses['TEST'].dates[0].endDate}`)
+                .send()
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.be.json;
+
+                    const body = res.body;
+                    expect(body).to.eql(Object.values(courses));
+                });
+        });
+
+        it('should not return courses after end date if specified', () => {
+            return chai.request(app)
+                .get(`/courses?end=${moment(courses['TEST'].dates[0].endDate).subtract(10, 'hour').toISOString()}`)
+                .send()
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.be.json;
+
+                    const body = res.body;
+                    expect(body).to.eql([]);
+                });
+        });
+
+        it('should not return courses before start date if specified', () => {
+            return chai.request(app)
+                .get(`/courses?start=${moment(courses['TEST'].dates[0].startDate).add(10, 'hours')}`)
+                .send()
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.be.json;
+
+                    const body = res.body;
+                    expect(body).to.eql([]);
+                });
+        });
+
+        it('should return courses after start date if specified', () => {
+            return chai.request(app)
+                .get(`/courses?start=${courses['TEST'].dates[0].startDate}`)
+                .send()
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.be.json;
+
+                    const body = res.body;
+                    expect(body).to.eql(Object.values(courses));
+                });
+        });
+
+        it('should return courses in interval between start and end date if specified', () => {
+            return chai.request(app)
+                .get(`/courses?start=${courses['TEST'].dates[0].startDate}&end=${courses['TEST'].dates[0].endDate}`)
+                .send()
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.be.json;
+
+                    const body = res.body;
+                    expect(body).to.eql(Object.values(courses));
+                });
+        });
+
+        it('should not return courses outside of interval between start and end date if specified', () => {
+            return chai.request(app)
+                .get(`/courses?start=${moment(courses['TEST'].dates[0].startDate).add(10, 'hours').toISOString()}&end=${moment(courses['TEST'].dates[0].endDate).add(10, 'hours').toISOString()}`)
+                .send()
+                .then(res => {
+                    expect(res).to.have.status(200);
+                    expect(res).to.be.json;
+
+                    const body = res.body;
+                    expect(body).to.eql([]);
                 });
         });
     });

@@ -3,12 +3,12 @@
         <div id="links">
             <div>
                 <router-link to="/courses">Kurse</router-link>
-                <router-link to="/booked"  v-if="this.user != null">Gebuchte Termine</router-link>
+                <router-link to="/booked"  v-if="this.user.id != null">Gebuchte Termine</router-link>
             </div>
         </div>
         <div id="title">{{ this.currentRouteName }}</div>
         <div id="login-container">
-            <button v-on:click="this.goToLogin" v-if="this.user == null">Log In</button>
+            <button v-on:click="this.goToLogin" v-if="this.user.id == null">Log In</button>
         </div>
     </header>
 </template>

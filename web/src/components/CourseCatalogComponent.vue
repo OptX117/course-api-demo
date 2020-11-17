@@ -17,6 +17,9 @@ export default {
         ...mapGetters({
             courses: 'getCourses'
         })
+    },
+    mounted() {
+        this.$store.dispatch('updateCourses');
     }
 };
 </script>

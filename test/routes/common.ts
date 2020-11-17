@@ -9,6 +9,7 @@ import { Express } from 'express';
 import { Course, CourseCategory, CourseDateBooking, User } from '../../src/types';
 import path from 'path';
 import { nanoid } from 'nanoid';
+import moment from 'moment';
 
 chai.use(chaiHttp);
 chai.use(sinonChai);
@@ -69,14 +70,16 @@ async function setupDB(): Promise<void> {
             title: 'TEST',
             dates: [{
                 id: nanoid(4),
-                startDate: '2020-11-13T18:00:00+01:00',
-                endDate: '2020-11-13T20:00:00+01:00',
-                totalSpots: 10
+                startDate: moment().add(10, 'days').add(10, 'hours').toISOString(),
+                endDate: moment().add(10, 'days').add(10, 'hours').add(30, 'minutes').toISOString(),
+                totalSpots: 10,
+                location: 'MARS'
             }, {
                 id: nanoid(4),
-                startDate: '2020-11-20T18:00:00+01:00',
-                endDate: '2020-11-20T20:00:00+01:00',
-                totalSpots: 5
+                startDate: moment().add(17, 'days').add(10, 'hours').toISOString(),
+                endDate: moment().add(17, 'days').add(10, 'hours').add(30, 'minutes').toISOString(),
+                totalSpots: 5,
+                location: 'THE MOON'
             }],
             price: 1887,
             description: 'TEST',
@@ -143,7 +146,8 @@ async function getDBEntries(): Promise<{ users: Record<string, User>, courses: R
                 id: v.id,
                 startDate: v.startDate,
                 endDate: v.endDate,
-                totalSpots: v.totalSpots
+                totalSpots: v.totalSpots,
+                location: v.location
             }));
 
             for (const key in currentValue) {

@@ -1,5 +1,4 @@
 import {
-    BookingService,
     Course,
     CourseCategory,
     CourseDate,
@@ -12,7 +11,8 @@ import CourseModel from '../models/Course';
 import CourseCategoryModel from '../models/CourseCategory';
 import { MongooseDocument } from 'mongoose';
 import logger from '../winston';
-import { v4 } from 'uuid';
+import moment from 'moment';
+import nanoid from 'nanoid';
 
 export default class CourseServiceImpl implements CourseService {
     private readonly userService: UserService;
@@ -21,10 +21,15 @@ export default class CourseServiceImpl implements CourseService {
         this.userService = userService;
     }
 
-    public getAllCourses(): Promise<Readonly<Course[]>> {
+    public getAllCourses(startDate?: string, endDate?: string): Promise<Readonly<Course[]>> {
+        startDate = startDate || moment().toISOString();
+        endDate = endDate || moment().add(10, 'years').toISOString();
         return CourseModel.find().exec().then(list => {
             return Promise.all(list.map((v) => this.convertCourseModelToCourse(v)));
-        }).then(list => Object.freeze(list.filter(v => v) as Course[]));
+        }).then(list => Object.freeze(list.filter(v => v).filter(v => {
+            return v?.dates.some(date => moment(date.startDate).isSameOrAfter(startDate) &&
+                                         moment(date.startDate).isSameOrBefore(endDate));
+        }) as Course[]));
     }
 
     public async addCourse(course: UpdateCourse): Promise<Course | undefined> {
@@ -44,13 +49,7 @@ export default class CourseServiceImpl implements CourseService {
             newCourse.dates = course.dates;
             (newCourse as any).category = category?._id;
 
-            const saved = await newCourseModel.save();
-
-            (course as any).lecturer = lecturer;
-
-            return Object.assign({
-                id: saved._id.toString()
-            }, course as any);
+            return this.convertCourseModelToCourse(await newCourseModel.save());
         }
     }
 
@@ -131,7 +130,7 @@ export default class CourseServiceImpl implements CourseService {
         if ((dbCourse as any).dates == null) {
             (dbCourse as any).dates = [];
         }
-        (date as CourseDate).id = v4();
+        (date as CourseDate).id = nanoid.nanoid(4);
 
         (dbCourse as any).dates.push(date);
 
@@ -188,6 +187,10 @@ export default class CourseServiceImpl implements CourseService {
 
         if (date.startDate != null) {
             dbDate.startDate = date.startDate;
+        }
+
+        if (date.location != null) {
+            dbDate.location = date.location;
         }
 
         await dbCourse.updateOne(dbCourse);

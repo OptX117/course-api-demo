@@ -9,7 +9,7 @@
             <div class="course-description">{{ course.description }}</div>
             <div class="sub-actions">
                 <div class="course-price">Preis: {{ course.price }}€</div>
-                <router-link :to="{ name: 'Termine', params: {courseid}}">Termine ({{ courseDates.length }} verfügbar)
+                <router-link :to="{ name: 'Termine', params: {courseid}}">Termine ({{ course.dates.length}} verfügbar)
                 </router-link>
             </div>
         </div>
@@ -26,21 +26,10 @@ export default {
     },
     computed: {
         ...mapGetters({
-            courses: 'getCourses',
-            dates: 'getDates'
+            courses: 'getCourses'
         }),
         course() {
-            if (this.courses)
-                return this.courses.find(course => course.id === this.courseid);
-            else
-                return null;
-        },
-        courseDates() {
-            if (this.course) {
-                return this.dates[this.courseid] || [];
-            } else {
-                return [];
-            }
+            return this.courses.find(course => course.id === this.courseid);
         }
     },
     mounted() {

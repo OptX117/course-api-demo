@@ -1,15 +1,64 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
+import debounce from 'p-debounce';
 
 Vue.use(Vuex);
 
+const debouncedBookings = debounce(function (context) {
+    return axios.get('/users/bookings')
+        .then(res => {
+            return res.data;
+        }, () => null).then(async bookings => {
+            if (bookings) {
+                let courses = context.state.courses;
+                if (courses.length === 0) {
+                    await context.dispatch('updateCourses');
+                    courses = context.state.courses;
+                }
+
+                if (courses.length === 0) {
+                    return false;
+                }
+
+                console.log(bookings, courses);
+
+                const ret = {};
+                for (const booking of bookings) {
+                    let course = courses.find(course => course.id === booking.course);
+                    if (course) {
+                        if (!ret[course.id])
+                            ret[course.id] = [];
+                        ret[course.id].push(booking);
+                    }
+                }
+
+                context.commit('setBookings', ret);
+
+                return true;
+            }
+            return false;
+        });
+}, 1000, {leading: true});
+
+const debouncedCourses = debounce(async function (context) {
+    const courses = await axios.get('/courses')
+        .then(res => {
+            return res.data;
+        }, err => {
+            console.error(err);
+        });
+    if (courses) {
+        context.commit('setCourses', courses);
+    }
+}, 1000, {leading: true});
+
 export default new Vuex.Store({
     state: {
-        user: undefined,
-        bookings: undefined,
-        courses: undefined,
-        dates: {}
+        user: {},
+        bookings: {},
+        courses: [],
+        dates: []
     },
     mutations: {
         setUser(state, user) {
@@ -21,8 +70,8 @@ export default new Vuex.Store({
         setCourses(state, courses) {
             state.courses = courses;
         },
-        setDates(state, update) {
-            state.dates = Object.assign(state.dates, update);
+        setDates(state, dates) {
+            state.dates = dates;
         }
     },
     actions: {
@@ -65,39 +114,31 @@ export default new Vuex.Store({
             }
         },
         async updateBookings(context) {
-            const bookings = await axios.get('/users/bookings')
-                .then(res => {
-                    return res.data;
-                }, () => null);
-
-            if (bookings) {
-                context.commit('setBookings', bookings);
-                return true;
-            }
-            return false;
+            await debouncedBookings(context);
         },
         async updateCourses(context) {
-            const courses = await axios.get('/courses')
-                .then(res => {
-                    return res.data;
-                }, err => {
-                    console.error(err);
-                });
-            if (courses) {
-                context.commit('setCourses', courses);
-            }
+            await debouncedCourses(context);
         },
         async updateDates(context, courseid) {
-            const dates = await axios.get('/courses/' + courseid+'/dates')
+            const dates = await axios.get('/courses/' + courseid + '/dates')
                 .then(res => {
                     return res.data;
                 }, err => {
                     console.error(err);
                 });
             if (dates) {
-                context.commit('setDates', {
-                    [courseid]: dates
-                });
+                context.commit('setDates', dates);
+            }
+        },
+        async bookDates(context, {course, date, spots}) {
+            if (await axios.post(`/courses/${course.id}/dates/${date.id}/bookings`, {
+                spots: +spots
+            }).then(res => res.data, err => {
+                console.error(`Error booking a spot for course ${course.id} and date ${date.id}`, err);
+                return false;
+            })) {
+                await context.dispatch('updateCourses');
+                await context.dispatch('updateBookings');
             }
         }
     },

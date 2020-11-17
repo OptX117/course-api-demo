@@ -1,8 +1,10 @@
 <template>
     <div class="bookings-container">
-        <div class="booking-container" v-for="booking in mappedBookings" :key="booking.id">
+        <div class="booking-container" v-for="booking in mappedBookings" :key="booking.id" :data-cy="`booking-${booking.id}`">
             <h3 class="booking-header">Kurs: <b>
-                <router-link :to="{ name: 'Einzelkurs', params: {courseid: booking.courseLink}}">{{ booking.courseTitle }}
+                <router-link :to="{ name: 'Einzelkurs', params: {courseid: booking.courseLink}}">{{
+                        booking.courseTitle
+                    }}
                 </router-link>
             </b></h3>
             <div class="booking-spots">Gebuchte Plätze <b>{{ booking.spots }}</b></div>
@@ -11,29 +13,33 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex';
+import {mapState} from 'vuex';
 
 export default {
     name: 'BookingsComponent',
     computed: {
+        ...mapState({
+            bookings: 'bookings',
+            courses: 'courses'
+        }),
         mappedBookings: function () {
-            if (this.courses && this.bookings) {
-                const courses = this.courses;
-                return this.bookings.map(booking => {
-                    const course = courses.find(el => el.id === booking.course);
-                    return {
-                        courseTitle: course.title,
-                        courseLink: course.id,
-                        spots: booking.spots
-                    };
-                });
-            }
-            return [];
-        },
-        ...mapGetters({
-            bookings: 'getBookings',
-            courses: 'getCourses'
-        })
+            return this.courses.map(course => {
+                const bookings = this.bookings[course.id];
+                if(!bookings) return [];
+                return bookings.map(booking => ({
+                    courseTitle: course.title,
+                    courseLink: course.id,
+                    spots: booking.spots,
+                    id: booking.id
+                }))
+            }).reduce((previousValue, currentValue) => {
+                previousValue.push(...currentValue);
+                return previousValue;
+            }, []);
+        }
+    },
+    mounted() {
+        this.$store.dispatch('updateBookings');
     }
 };
 </script>

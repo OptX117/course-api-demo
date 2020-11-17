@@ -195,12 +195,14 @@ gulp.task('fill-db', gulp.series('start-db', 'clear-db', async () => {
                 id: nanoid(4),
                 startDate: '2020-11-13T18:00:00+01:00',
                 endDate: '2020-11-13T20:00:00+01:00',
-                totalSpots: 10
+                totalSpots: 10,
+                location: 'Domplatte'
             }, {
                 id: nanoid(4),
                 startDate: '2020-11-20T18:00:00+01:00',
                 endDate: '2020-11-20T20:00:00+01:00',
-                totalSpots: 5
+                totalSpots: 5,
+                location: 'PLANET X'
             }],
             price: 1887,
             description: 'TEST',
@@ -270,3 +272,13 @@ gulp.task('serve-frontend', gulp.parallel('watch', () => {
         stdio: 'inherit'
     });
 }));
+
+gulp.task('test-frontend', (cb) => {
+    const test = spawn('mocha', ['test/**/*.spec.js'], {
+        cwd: path.join(__dirname, 'web'),
+        stdio: 'inherit'
+    });
+    test.on('close', function () {
+        cb();
+    });
+})
