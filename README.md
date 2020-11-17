@@ -88,7 +88,7 @@ To run e2e tests against, run
 This will launch the backend, a database and the frontend, as well as execute cypress.io tests.
 
 
-##Configuration
+## Configuration
 A configuration json is present in src/config/config.json that is copied into bin/config/config.json on build.
 
 The following configuration items are available:
