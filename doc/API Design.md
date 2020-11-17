@@ -1,6 +1,8 @@
 # API Design
 The API should follow the basics of RESTful API design, and also be easily discoverable / testable.
 
+For an early sketch of the API see [Apidesign_201113_201407.pdf](Apidesign_201113_201407.pdf)
+
 ## The API itself
 ### Paths, Resources, Collections
 Related resources, like the dates a course is held at, should be reachable via a simple path showing their relation.
