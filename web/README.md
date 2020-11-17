@@ -7,7 +7,7 @@ What works:
 * Getting Courses, Course Dates, Bookings
 * Booking spots for a specific date
 
-For dev login usernames / passwords see Backend Readme.
+For dev login usernames / passwords see [Backend Readme](/README.md).
 
 Some what modern browser is expected (Edge >= 16, Chrome >= 51, FF >= 60)
 

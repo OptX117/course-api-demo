@@ -103,3 +103,13 @@ The following configuration items are available:
 * `jwt`: Secret used to sign the JWT tokens
 
 In reality these would probably all be environment variables or set via a configuration server.
+
+## Demo-Logins
+
+The gulp task fill-db inserts the following users into the db:
+
+Username | Password | isLecturer | Has courses booked / is lecturing?
+---------|----------|-----------|----------------------------------
+001 | 001 | false | X
+002 | 002 | true | X
+003 | 003 | true | O

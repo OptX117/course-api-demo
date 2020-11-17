@@ -42,3 +42,5 @@ It should do so using the OpenAPI 3.0 specifications, but implementing a hyperme
 Since writing and maintaining additional artifacts after the fact can lead to errors, this documentation should be a direct or indirect automatic result of the build process. 
 
 The API should also give users a simple way to access the documentation using Swagger UI.
+
+Next Steps: [link](/doc/Next%20Steps.md)
