@@ -11,6 +11,10 @@ export interface ConfigurationService {
      */
     getConfiguration(): Promise<Readonly<Configuration>>;
 
+    /**
+     * Get the open API definition file
+     * @returns {Promise<Readonly<Record<string, unknown>>>}
+     */
     getOpenAPIDefinition(): Promise<Readonly<Record<string, unknown>>>;
 }
 
@@ -45,15 +49,23 @@ export interface SchemaStore {
  */
 export interface SchemaService {
     /**
-     * Validate a given object against one or more schemas
+     * Validate a given object against one or more schemas. <br>
+     * Paths to schemas are relative to schema folder.
      * @param {Record<string, ?>} obj The object to validate
      * @param {string} schemaName The main schema to validate against
-     * @param {string[]} additionalSchemas Additional schemas to load
+     * @param {string[]} additionalSchemas Additional schemas to load, can be single file or path to folder
      * @returns {Promise<ValidatorResult>} Resolves with any validator errors or success
      */
     validateSchema(obj: Record<string, unknown>, schemaName: string,
                    additionalSchemas?: string[]): Promise<ValidatorResult>;
 
+    /**
+     * Utility function to validate an incoming request against a specified set of schemas <br>
+     * Paths to schemas are relative to schema folder.
+     * @param {string} schemaName
+     * @param {string[]} additionalSchemas
+     * @returns {(req: e.Request, res: e.Response, next: e.NextFunction) => void}
+     */
     validateRequest(schemaName: string, additionalSchemas: string[]): (req: Request, res: Response,
                                                                        next: NextFunction) => void;
 }
@@ -72,20 +84,60 @@ export interface CourseService {
      */
     getAllCourses(startDate?: string, endDate?: string): Promise<Readonly<Course[]>>;
 
+    /**
+     * Gets a course, returns undefined when not found
+     * @param {string} id
+     * @returns {Promise<Course | undefined>}
+     */
     getCourse(id: string): Promise<Course | undefined>;
 
+    /**
+     * Deletes a course, returns undefined if not found
+     * @param {string} id
+     * @returns {Promise<Course | undefined>}
+     */
     deleteCourse(id: string): Promise<Course | undefined>;
 
     getCourseCategories(): Promise<Readonly<CourseCategory[]>>;
 
+    /**
+     * Updates values of an existing course, returns undefined if not found
+     * @param {string} id
+     * @param {Partial<UpdateCourse>} course
+     * @returns {Promise<Course | undefined>}
+     */
     updateCourse(id: string, course: Partial<UpdateCourse>): Promise<Course | undefined>;
 
+    /**
+     * Adds a course, returns undefined if user is not a lecturer
+     * @param {UpdateCourse} course
+     * @returns {Promise<Course | undefined>}
+     */
     addCourse(course: UpdateCourse): Promise<Course | undefined>;
 
+    /**
+     * Adds a course date to a course, returns undefined if user is not the lecturer of the course
+     * @param {string} id
+     * @param {UpdateCourseDate} date
+     * @returns {Promise<CourseDate | undefined>}
+     */
     addCourseDate(id: string, date: UpdateCourseDate): Promise<CourseDate | undefined>;
 
+    /**
+     * Updates a course date, returns undefined if user is not the lecturer of the course
+     * @param {string} id
+     * @param {string} dateid
+     * @param {UpdateCourseDate} date
+     * @returns {Promise<CourseDate | undefined>}
+     */
     updateCourseDate(id: string, dateid: string, date: UpdateCourseDate): Promise<CourseDate | undefined>;
 
+    /**
+     * Deletes a course date, returns undefined if user is not the lecturer of the course
+     * @param {string} id
+     * @param {string} dateid
+     * @returns {Promise<CourseDate | undefined>}
+     */
     deleteCourseDate(id: string, dateid: string): Promise<CourseDate | undefined>;
 }
 
