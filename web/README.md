@@ -39,16 +39,26 @@ The third expects the frontend to already be running at localhost port 8080.
 * Running the frontend using a self signed cert for the samesite cookie attribute to work correctly in dev & during e2e tests
 * Unit tests...
 
-##Screenshots of the monstrosity
+## Screenshots of the monstrosity
 
-###Landing page
-![Landing page](/doc/LandingPage.jpeg)
-###Login screen
-![Login screen](/doc/LoginScreen.jpeg)
-###Courses overview
-![Courses overview](/doc/Courses.jpeg)
-###Course "detail" view
-![Course detail view](/doc/CourseView.jpeg)
-###Course dates & booking
-![Course dates and booking](/doc/BookingCourseDates.jpeg)
+### Landing page
+
+![Landing page](/web/doc/LandingPage.jpeg)
+
+### Login screen
+
+![Login screen](/web/doc/LoginScreen.jpeg)
+
+### Courses overview
+
+![Courses overview](/web/doc/Courses.jpeg)
+
+### Course "detail" view
+
+![Course detail view](/web/doc/CourseView.jpeg)
+
+### Course dates & booking
+
+![Course dates and booking](/web/doc/BookingCourseDates.jpeg)
+
 
