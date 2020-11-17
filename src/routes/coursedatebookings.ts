@@ -19,7 +19,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     * /courses/{courseid}/dates/{dateid}/bookings:
+     * /api/v1/courses/{courseid}/dates/{dateid}/bookings:
      *   parameters:
      *    - $ref: "#/components/parameters/CourseId"
      *    - $ref: "#/components/parameters/CourseDateId"
@@ -62,7 +62,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     * /courses/{courseid}/dates/{dateid}/bookings:
+     * /api/v1/courses/{courseid}/dates/{dateid}/bookings:
      *   parameters:
      *    - $ref: "#/components/parameters/CourseId"
      *    - $ref: "#/components/parameters/CourseDateId"
@@ -117,7 +117,7 @@ export default function (app: Express): Router {
 
     /**
      * @openid
-     *  /courses/{courseid}/dates/{dateid}/bookings/{bookingid}:
+     *  /api/v1/courses/{courseid}/dates/{dateid}/bookings/{bookingid}:
      *   parameters:
      *    - $ref: "#/components/parameters/CourseId"
      *    - $ref: "#/components/parameters/CourseDateId"
@@ -162,7 +162,7 @@ export default function (app: Express): Router {
 
     /**
      * @openid
-     *  /courses/{courseid}/dates/{dateid}/bookings/{bookingid}:
+     *  /api/v1/courses/{courseid}/dates/{dateid}/bookings/{bookingid}:
      *   parameters:
      *    - $ref: "#/components/parameters/CourseId"
      *    - $ref: "#/components/parameters/CourseDateId"
@@ -217,7 +217,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     * /courses/{courseid}/dates/{dateid}/bookings/{bookingid}:
+     * /api/v1/courses/{courseid}/dates/{dateid}/bookings/{bookingid}:
      *  parameters:
      *    - $ref: "#/components/parameters/CourseId"
      *    - $ref: "#/components/parameters/CourseDateId"

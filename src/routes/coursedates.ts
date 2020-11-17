@@ -66,7 +66,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     *  /courses/{courseid}/dates:
+     *  /api/v1/courses/{courseid}/dates:
      *   parameters:
      *    - $ref: "#/components/parameters/CourseId"
      *   get:
@@ -102,7 +102,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     * /courses/{courseid}/dates:
+     * /api/v1/courses/{courseid}/dates:
      *   parameters:
      *    - $ref: "#/components/parameters/CourseId"
      *   post:
@@ -168,7 +168,7 @@ export default function (app: Express): Router {
 
     /**
      * @openid
-     * /courses/{courseid}/dates/{dateid}:
+     * /api/v1/courses/{courseid}/dates/{dateid}:
      *   parameters:
      *    - $ref: "#/components/parameters/CourseId"
      *    - $ref: "#/components/parameters/CourseDateId"
@@ -203,7 +203,7 @@ export default function (app: Express): Router {
 
     /**
      * @openid
-     * /courses/{courseid}/dates/{dateid}:
+     * /api/v1/courses/{courseid}/dates/{dateid}:
      *   parameters:
      *    - $ref: "#/components/parameters/CourseId"
      *    - $ref: "#/components/parameters/CourseDateId"
@@ -260,7 +260,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     *  /courses/{courseid}/dates/{dateid}:
+     *  /api/v1/courses/{courseid}/dates/{dateid}:
      *   parameters:
      *    - $ref: "#/components/parameters/CourseId"
      *    - $ref: "#/components/parameters/CourseDateId"

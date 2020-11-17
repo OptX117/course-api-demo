@@ -6,7 +6,7 @@ import debounce from 'p-debounce';
 Vue.use(Vuex);
 
 const debouncedBookings = debounce(function (context) {
-    return axios.get('/users/bookings')
+    return axios.get('/api/v1/users/bookings')
         .then(res => {
             return res.data;
         }, () => null).then(async bookings => {
@@ -42,7 +42,7 @@ const debouncedBookings = debounce(function (context) {
 }, 1000, {leading: true});
 
 const debouncedCourses = debounce(async function (context) {
-    const courses = await axios.get('/courses')
+    const courses = await axios.get('/api/v1/courses')
         .then(res => {
             return res.data;
         }, err => {
@@ -76,7 +76,7 @@ export default new Vuex.Store({
     },
     actions: {
         async getUserInfo(context) {
-            const user = await axios.get('/users/me')
+            const user = await axios.get('/api/v1/users/me')
                 .then(res => {
                     if (res.status === 200) {
                         return res.data;
@@ -92,7 +92,7 @@ export default new Vuex.Store({
             return false;
         },
         async logIn(context, value) {
-            const user = await axios.post('/users/login', value, {
+            const user = await axios.post('/api/v1/users/login', value, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -120,7 +120,7 @@ export default new Vuex.Store({
             await debouncedCourses(context);
         },
         async updateDates(context, courseid) {
-            const dates = await axios.get('/courses/' + courseid + '/dates')
+            const dates = await axios.get('/api/v1/courses/' + courseid + '/dates')
                 .then(res => {
                     return res.data;
                 }, err => {
@@ -131,7 +131,7 @@ export default new Vuex.Store({
             }
         },
         async bookDates(context, {course, date, spots}) {
-            if (await axios.post(`/courses/${course.id}/dates/${date.id}/bookings`, {
+            if (await axios.post(`/api/v1/courses/${course.id}/dates/${date.id}/bookings`, {
                 spots: +spots
             }).then(res => res.data, err => {
                 console.error(`Error booking a spot for course ${course.id} and date ${date.id}`, err);

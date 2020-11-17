@@ -12,7 +12,7 @@ export default function (app: Express): Router {
     /**
      * @openapi
      * paths:
-     *  /users/me:
+     *  /api/v1/users/me:
      *   get:
      *    operationId: getCurrentUser
      *    tags:
@@ -47,7 +47,7 @@ export default function (app: Express): Router {
     /**
      * @openapi
      * paths:
-     *  /users/login:
+     *  /api/v1/users/login:
      *   post:
      *    operationId: getUserInfo
      *    tags:
@@ -103,7 +103,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     * /users/bookings:
+     * /api/v1/users/bookings:
      *   get:
      *    operationId: getCurrentUser
      *    tags:

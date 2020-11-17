@@ -26,8 +26,12 @@ const routes = [
     },
     {
         path: '/courses', component: CourseCatalogComponent, name: 'Kurse'
-    }
+    },
+    {path: '*', redirect: '/'}
 ];
+
+
+
 
 // 3. Create the router instance and pass the `routes` option
 // You can pass in additional options here, but let's
@@ -35,6 +39,11 @@ const routes = [
 const router = new VueRouter({
     routes // short for `routes: routes`
 });
+
+router.beforeEach((to, from, next) => {
+    if (!['Login', 'Home', 'Kurse', 'Einzelkurs', 'Termine'].includes(to.name) && !store.state.user.id) next({ name: 'Login' })
+    else next()
+})
 
 new Vue({
     store,

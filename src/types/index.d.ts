@@ -64,6 +64,12 @@ export type UpdateCourse = Omit<Course, 'id' | 'lecturer'> & { lecturer: string 
  * Service for managing course instances and related logic
  */
 export interface CourseService {
+    /**
+     * Get all courses or optionally filter for start and end dates.
+     * @param {string} startDate ISO 8601 string (eg. moment().toISOString())
+     * @param {string} endDate ISO 8601 string (eg. moment().toISOString())
+     * @returns {Promise<Readonly<Course[]>>}
+     */
     getAllCourses(startDate?: string, endDate?: string): Promise<Readonly<Course[]>>;
 
     getCourse(id: string): Promise<Course | undefined>;
@@ -183,11 +189,34 @@ export interface CourseDateBooking {
 
 export type CourseDateBookingUpdate = Partial<Omit<CourseDateBooking, 'id' | 'user'>>;
 
+/**
+ * Service for managing bookings for courses
+ */
 export interface BookingService {
+    /**
+     * Book one ore more spots if available for the given course & date.
+     * @param {Course} course Used to map the date
+     * @param {User} user The user to book for
+     * @param {number} spots How many spots to book
+     * @param {string} dateId At which date to book the spots.
+     * @throws Exception in the promise if not enough spots are available.
+     * @returns {Promise<CourseDateBooking>}
+     */
     bookSpots(course: Course, user: User, spots: number, dateId: string): Promise<CourseDateBooking>;
 
+    /**
+     * Get all bookings for a user for course, or all bookings for the course or all if user is lecturer or userOrAll is true
+     * @param {Course} course The course to get all bookings for
+     * @param {User | true} userOrAll The user to filter for, or a true boolean if the filter should be skipped
+     * @returns {Promise<CourseDateBooking[]>} Filtered or conditionally unfiltered list of bookings for the given course and user
+     */
     getBookings(course: Course, userOrAll: User | true): Promise<CourseDateBooking[]>;
 
+    /**
+     * Get all bookings of a user regardless of course
+     * @param {User} user
+     * @returns {Promise<CourseDateBooking[]>}
+     */
     getAllUserBookings(user: User): Promise<CourseDateBooking[]>;
 
     getBooking(bookingId: string): Promise<CourseDateBooking | undefined>;
@@ -196,5 +225,11 @@ export interface BookingService {
 
     deleteBooking(bookingId: string, user: User): Promise<CourseDateBooking | undefined>;
 
+    /**
+     * Get remaining spots on a course date.
+     * @param {Course} course
+     * @param {string} dateId
+     * @returns {Promise<number>}
+     */
     getOpenSpots(course: Course, dateId: string): Promise<number>;
 }

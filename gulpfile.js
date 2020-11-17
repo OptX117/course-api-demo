@@ -49,6 +49,22 @@ gulp.task('generate-openapi-json', async () => {
     await fs.writeFile(path.join(targetPath, 'config', 'openapi.json'), JSON.stringify(definitions, null, 4));
 });
 
+
+gulp.task('build-frontend', (cb) => {
+    const build = spawn('npm', ['run', 'build'], {
+        cwd: path.join(__dirname, 'web'),
+        stdio: 'inherit'
+    });
+    build.on('close', function () {
+        cb();
+    });
+})
+
+gulp.task('copy-frontend', () => {
+    return gulp.src('web/dist/**')
+        .pipe(gulp.dest('bin/web'));
+});
+
 gulp.task('generate-json-schemas-from-openapi-json', async () => {
     const {components} = require(path.join(targetPath, 'config', 'openapi.json'));
     const {schemas, requestBodies} = components;
@@ -89,7 +105,7 @@ gulp.task('copy-static-json-files', () => {
         .pipe(gulp.dest(path.join(targetPath, folder)))));
 });
 
-gulp.task('build', gulp.series('webpack', 'copy-static-json-files', 'generate-openapi-json', 'generate-json-schemas-from-openapi-json'));
+gulp.task('build', gulp.series('webpack', 'copy-static-json-files', 'generate-openapi-json', 'generate-json-schemas-from-openapi-json', 'build-frontend', 'copy-frontend'));
 
 gulp.task('start', async () => {
     if (node) node.kill();
@@ -267,18 +283,39 @@ gulp.task('watch', gulp.series('build', 'start-db', 'start', () => {
 }));
 
 gulp.task('serve-frontend', gulp.parallel('watch', () => {
-    const frontend = spawn('npm', ['run', 'serve'], {
+    spawn('npm', ['run', 'serve'], {
         cwd: path.join(__dirname, 'web'),
         stdio: 'inherit'
     });
 }));
 
-gulp.task('test-frontend', (cb) => {
-    const test = spawn('mocha', ['test/**/*.spec.js'], {
+exports['test-frontend'] = (cb) => {
+    const test = spawn('npm', ['run', 'test:unit'], {
         cwd: path.join(__dirname, 'web'),
         stdio: 'inherit'
     });
     test.on('close', function () {
         cb();
     });
-})
+}
+
+exports['test-e2e'] = (cb) => {
+    gulp.series('build', 'fill-db')(() => {
+        startDB(() => {
+            gulp.task('start')();
+
+            const test = spawn('npm', ['run', 'test:e2e:headless'], {
+                cwd: path.join(__dirname, 'web'),
+                stdio: 'inherit'
+            });
+            test.on('close', function () {
+                docker.kill();
+                node.kill();
+                cb();
+            });
+        });
+
+    })
+};
+
+exports['start-both'] = gulp.parallel('watch', 'serve-frontend')

@@ -17,9 +17,6 @@ export default {
         this.$store.dispatch('getUserInfo').then(ret => {
             if (ret)
                 this.$store.dispatch('updateBookings');
-            else {
-                this.$router.push({name: 'Login'})
-            }
         });
     }
 };

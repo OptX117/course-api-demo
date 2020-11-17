@@ -10,7 +10,7 @@
                 <input id="password" type="password">
             </div>
             <div class="btnRow">
-                <button v-on:click.prevent="login">Login</button>
+                <button v-on:click.prevent="login" id="login-btn">Login</button>
             </div>
         </form>
     </div>

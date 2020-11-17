@@ -114,17 +114,20 @@ describe('BookingsComponent', () => {
                 {
                     courseTitle: 'TEST',
                     courseLink: '5fb2dbedc6fe6e23e4202fdd',
-                    spots: 2
+                    spots: 2,
+                    id: '5fb2dbedc6fe6e23e4202fde'
                 },
                 {
                     courseTitle: 'TEST',
                     courseLink: '5fb2dbedc6fe6e23e4202fdd',
-                    spots: 3
+                    spots: 3,
+                    id: '5fb2dbedc6fe6e23e4202fdf',
                 },
                 {
                     courseTitle: 'TEST',
                     courseLink: '5fb2dbedc6fe6e23e4202fdd',
-                    spots: 1
+                    spots: 1,
+                    id: '5fb2dbedc6fe6e23e4202fe0',
                 }
             ]);
     });

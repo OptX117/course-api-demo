@@ -3,3 +3,29 @@ node_modules
 .idea
 *.iml
 db
+
+web/.DS_Store
+web/node_modules
+web/dist
+web/tests/e2e/videos
+web/tests/e2e/screenshots
+
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

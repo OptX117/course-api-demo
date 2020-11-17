@@ -112,7 +112,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     * /courses:
+     * /api/v1/courses:
      *   get:
      *    operationId: getCourseList
      *    tags:
@@ -169,7 +169,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     * /courses:
+     * /api/v1/courses:
      *   post:
      *    operationId: createCourse
      *    tags:
@@ -211,7 +211,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     *  /courses/{courseid}:
+     *  /api/v1/courses/{courseid}:
      *   parameters:
      *   - $ref: "#/components/parameters/CourseId"
      *   get:
@@ -249,7 +249,7 @@ export default function (app: Express): Router {
 
     /**
      * @openapi
-     * /courses/{courseid}:
+     * /api/v1/courses/{courseid}:
      *  parameters:
      *   - $ref: "#/components/parameters/CourseId"
      *  put:

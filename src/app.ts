@@ -3,6 +3,7 @@ import path from 'path';
 import expressWinston from 'express-winston';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+import swaggerUi from 'swagger-ui-express';
 
 import Constants from './constants';
 import { Configuration } from './types';
@@ -69,11 +70,19 @@ export default async function initApplication(configFolder: string,
     app.set(Constants.AuthorizationService, authService);
     app.set(Constants.BookingService, bookingService);
 
-    app.use(registerRoutes(app));
+    app.use(express.static('web'));
 
-    app.get('/openapi.json', async (req, res) => {
+    app.use('/api/v1', registerRoutes(app));
+
+    app.get('/api/v1/openapi.json', async (req, res) => {
         res.json(await configService.getOpenAPIDefinition());
     });
+
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(undefined, {
+        swaggerOptions: {
+            url: '/api/v1/openapi.json'
+        }
+    }));
 
     app.use((req, res) => {
         logger.error(`Path ${req.path} not found.`);
